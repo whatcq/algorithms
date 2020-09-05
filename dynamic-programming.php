@@ -14,6 +14,7 @@ class Solution
         if ($n == 2) return 2;
         return $this->climbStairs($n - 1) + $this->climbStairs($n - 2);
     }
+
     /**
      * Fibonacci sequence
      * 递归法，默认参数初始值，通过传参轮替前两数，妙
@@ -104,7 +105,7 @@ class Solution
         }
         return $max;
     }
-    
+
     /**
      * 买卖股票的最佳时机
      * 没理清如何简化问题。。
@@ -289,32 +290,97 @@ class Solution
 
     /**
      * 1562. 查找大小为 M 的最新分组
-     * @todo 挺复杂一个题，超时。。
      * @param Integer[] $arr
      * @param Integer $m
      * @return Integer
+     * 挺复杂一个题，超时。。
+     * 经典的一个题，两个思路的巨大差别
      */
     function findLatestStep($arr, $m)
     {
         if ($m == ($n = count($arr))) return $m;
+        //$str = str_repeat('0', $n);
+        //没想到，顺着来反而更好！
+        //link这个思想很高级，所有区间，都用(start=>end,end=>start)来表示，
+        //新加一个直接判断相邻就合并！摸石头过河，不需要搜索！【快】
+        //相比倒过来思考，这个得遍历完整个数组，才能找到m最后的所在。
+        $link = [];
+        $count = 0;
+        $step = -1;
+        for ($i = 0; $i < $n; $i++) {
+            $x = $arr[$i];
+            $l = isset($link[$x - 1]) ? $link[$x - 1] : $x;
+            $r = isset($link[$x + 1]) ? $link[$x + 1] : $x;
+            if ($x - $l == $m) $count--;//当前与左边合并，x-l+1==m+1则原来左边长度m=>m+1了，所以计数减一
+            if ($r - $x == $m) $count--;//这里仔细才能捋清
+            if ($r - $l + 1 == $m) $count++;//当前无论是否合并后，连成的长度
+            if ($count > 0) $step = $i + 1;//记录或更新含有m长度的步骤
+            $link[$l] = $r;
+            $link[$r] = $l;
+            //$str[$arr[$i] - 1] = '1';
+            //echo "$str=====$i\n";
+            //echo "$i => $x ==== $l $r\n";
+            //print_r($link);
+        }
+        return $step;
+
+        //==============
+        //我的思路，倒过来看找第一次出现m长度的字符串的时候。没问题
+        //问题是：需要记录所有连续区间，每次循环都需要去找到对应区间
+        //那么就找吧，顺序搜索超时，改成二分法查找依然超时，
+        //其他语言有TreeSet这样的查找树功能，提升了一点性能能通过，但php二分查找已经是优化了。。
+        if ($m == ($n = count($arr))) return $m;
 
         $i = $n;
         $range = [1 => $n];
+        $range = [1, $n];
+        $str = str_repeat('1', $n);
         while ($i-- > $m) {
             $cur = $arr[$i];
-            foreach ($range as $start => $end) {
-                if ($cur >= $start && $cur <= $end) {
-                    if ($m == $cur - $start || $m == $end - $cur) return $i;
-                    if ($start == $cur) unset($range[$start]);
-                    else $range[$start] = $cur - 1;
-                    if ($end > $cur) $range[$cur + 1] = $end;
-                    break;
+            // 改成二分法搜索，好不容易调试对了，但依然超时！
+            $l = 0;
+            $r = count($range) - 1;//=== 2 * ($n - $i + 1) - 1;
+            while ($l < $r - 1) {
+                $middle = intval(($l + $r) / 2);
+                if ($range[$middle] > $cur) {
+                    $r = $middle;
+                } else {
+                    $l = $middle;
                 }
+                //echo "$l $r\n";
             }
+            //l>=middle,
+            if ($l % 2) {
+                $l--;
+                $r--;
+            }
+            $start = $range[$l];
+            $end = $range[$r];
+            //echo "------------------\n";
+            //echo "$start, $end, $cur==$arr[$i]\n";
+            if ($m == $cur - $start || $m == $end - $cur) return $i;
+            if ($start == $cur) $range[$l] = $cur + 1;
+            elseif ($end == $cur) $range[$r] = $cur - 1;
+            else array_splice($range, $l + 1, 0, [$cur - 1, $cur + 1]);
+
+            //$str[$arr[$i] - 1] = '.';
+            //echo "$str=====$i\n";
+            //echo implode(" ", $range), "\n";
+
+            //======顺序搜索
+            // foreach ($range as $start => $end) {
+            //     if ($cur >= $start && $cur <= $end) {
+            //         if ($m == $cur - $start || $m == $end - $cur) return $i;
+            //         if ($start == $cur) unset($range[$start]);
+            //         else $range[$start] = $cur - 1;
+            //         if ($end > $cur) $range[$cur + 1] = $end;
+            //         break;
+            //     }
+            // }
         }
         return -1;
     }
-    
+
     /**
      * 332. 重新安排行程
      * 实际上是把所有二级数组首尾连起来。。
@@ -556,6 +622,7 @@ class Solution
         unset($nums[$j]);
         return array_values($nums);
     }
+
     //=============
     private $f = [];//包含当前值
     private $g = [];//不包含当前值 的最大可能
