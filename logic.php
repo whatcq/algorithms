@@ -620,4 +620,95 @@ class Solution
         $add && $p = '1' . $p;
         return $p;
     }
+    
+    private $maze = ["S#O", "M..", "M.T"];
+    private $m;
+    private $n;
+    //private $map;//STMO#.
+
+    /**
+     * @param String[] $maze
+     * @return Integer
+     */
+    function minimalSteps($maze)
+    {
+        $this->maze = $maze;
+        $this->m = $m = count($maze);
+        $this->n = $n = strlen($maze[0]);
+        $map = [];
+        foreach ($maze as $i => $row) {
+            for ($j = 0; $j < $n; $j++) {
+                //echo $row[$j];
+                isset($map[$row[$j]]) or $map[$row[$j]] = [];
+                array_push($map[$row[$j]], [$i, $j]);
+            }
+        }
+        //print_r($map);
+        $this->map = $map;
+
+        if (isset($map['M'])) {
+            if (isset($map['O'])) {
+                //$A = $this->findStepCount($map['S'])
+            }
+        }
+
+        return $this->findStepCount($map['S'][0], $map['T'][0]);
+    }
+
+    function findStepCount($start, $target, $count = 0)
+    {
+        static $roadMap = [];
+        // no!
+        if ($this->maze[$start[0]][$start[1]] === '#') return -1;
+        // record min step
+        if (isset($roadMap[$start[0]][$start[1]])) {
+            if ($roadMap[$start[0]][$start[1]] > $count) $roadMap[$start[0]][$start[1]] = $count;
+            else return -1;//走转了，放弃
+        } else {
+            $roadMap[$start[0]][$start[1]] = $count;
+        }
+        // found
+        if ($start == $target) {
+            return $roadMap[$target[0]][$target[1]];
+        }
+        // explore
+        $try = [];
+        $start[0] < $this->m - 1 && $try[] = $this->findStepCount([$start[0] + 1, $start[1]], $target, $count + 1);
+        $start[1] < $this->n - 1 && $try[] = $this->findStepCount([$start[0], $start[1] + 1], $target, $count + 1);
+        $start[0] > 0 && $try[] = $this->findStepCount([$start[0] - 1, $start[1]], $target, $count + 1);
+        $start[1] > 0 && $try[] = $this->findStepCount([$start[0], $start[1] - 1], $target, $count + 1);
+        $try = array_filter($try, function ($item) {
+            return $item > 0;
+        });
+        return $try ? min($try) : -1;
+    }
 }
+
+function p($ditu)
+{
+    foreach ($ditu as $j => $row) {
+        echo implode(' ', $row), "\n";
+    }
+    echo "\n";
+}
+
+//$ditu = [["X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X"],["X","X","X","X","X","X","X","X","X","O","O","O","X","X","X","X","X","X","X","X"],["X","X","X","X","X","O","O","O","X","O","X","O","X","X","X","X","X","X","X","X"],["X","X","X","X","X","O","X","O","X","O","X","O","O","O","X","X","X","X","X","X"],["X","X","X","X","X","O","X","O","O","O","X","X","X","X","X","X","X","X","X","X"],["X","X","X","X","X","O","X","X","X","X","X","X","X","X","X","X","X","X","X","X"]];
+//p($ditu);
+//$ditu = [["X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X"],["X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X"],["X","X","X","X","X","O","X","X","X","X","X","X","X","X","X","X","X","X","X","X"],["X","X","X","X","X","O","X","X","X","X","X","X","X","X","X","X","X","X","X","X"],["X","X","X","X","X","O","X","X","X","X","X","X","X","X","X","X","X","X","X","X"],["X","X","X","X","X","O","X","X","X","X","X","X","X","X","X","X","X","X","X","X"]];
+//p($ditu);
+$ditu = [["X", "X", "X", "X"], ["X", "O", "O", "X"], ["X", "X", "O", "X"], ["X", "O", "X", "X"]];
+p($ditu);
+(new Solution())->solve($ditu);
+p($ditu);
+die;
+
+$dilei =
+    [["E", "E", "E", "E", "E", "E", "E", "E"], ["E", "E", "E", "E", "E", "E", "E", "M"], ["E", "E", "M", "E", "E", "E", "E", "E"], ["M", "E", "E", "E", "E", "E", "E", "E"], ["E", "E", "E", "E", "E", "E", "E", "E"], ["E", "E", "E", "E", "E", "E", "E", "E"], ["E", "E", "E", "E", "E", "E", "E", "E"], ["E", "E", "M", "M", "E", "E", "E", "E"]];
+p($dilei);
+$r = (new Solution())->updateBoard($dilei, [0, 0]);
+p($r);
+die;
+die;
+$r = (new Solution())->removeBoxes([1, 2, 3, 2]);
+print_r($r);
+die;

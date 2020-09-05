@@ -293,26 +293,4 @@ class Solution
         return $ans;
     }
 
-    /**
-     * 二分法搜索大于$k的最小值
-     * @param array $arr 索引连续0,1,2,3..的升序数组（不从0开始则需改代码）
-     * @param $k
-     * @return int index of arr item which > $k
-     */
-    function bisect_right($arr, $k)
-    {
-        if ($k < $arr[0]) return 0;
-        $r = count($arr) - 1;
-        if ($k >= $arr[$r]) return -1;
-        $l = 0;
-        while ($l < $r - 1) {
-            $m = floor(($l + $r) / 2);
-            if ($arr[$m] > $k) {
-                $r = $m;
-            } else {
-                $l = $m;
-            }
-        }
-        return $r;
-    }
 }
