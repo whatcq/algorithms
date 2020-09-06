@@ -292,5 +292,70 @@ class Solution
         }
         return $ans;
     }
+    
+    /**
+     * 避免重复字母的最小删除成本
+     * 很简单一个题，判断边界得整理好套路!
+     * @param String $s
+     * @param Integer[] $cost 字符串s每个字符对应的删除成本
+     * @return Integer
+     */
+    function minCost($s, $cost)
+    {
+        $c = 0;
+        $max = 0;
+        foreach ($cost as $i => $t) {
+            if ($i && $s[$i] == $s[$i - 1]) {
+                if (!$max) {
+                    $c += $cost[$i - 1];
+                    $max = $cost[$i - 1];
+                }
+                $c += $t;
+                if ($t > $max) $max = $t;
+            } elseif ($max > 0) {
+                $c -= $max;
+                $max = 0;
+            }
+            //echo "$i => $t $s[$i] ==> $c, $max\n";
+        }
+        return $c - $max;
+        
+        $c = $start = $end = 0;
+        for ($i = 1, $n = strlen($s); $i < $n; $i++) {
+            if ($s[$i] == $s[$start]) $end = $i;
+            else {
+                if ($start < $end) $c += $this->cost($cost, $start, $end);
+                $start = $i;
+            }
+            //echo "\n-- $s[$i] == $start";
+        }
+        if ($start < $end) $c += $this->cost($cost, $start, $end);
+        return $c;
+    }
+
+    function cost($cost, $start, $end)
+    {
+        //其实就是留下max
+        $_cost = array_slice($cost, $start, $end - $start + 1);
+        print_r($_cost);
+        return array_sum($_cost) - max($_cost);
+
+        //又想错了，删了还会连一起
+        //echo "$start,$end\n";
+        $c = min($cost[$start], $cost[$end]);
+        for ($i = $start + 1; $i < $end; $i++) {
+            $c += $cost[$i];
+        }
+        return $c;
+        // 根本想错了。。不是rob题目
+        $c[$start] = $cost[$start];
+        $c[$start + 1] = $cost[$start + 1];
+        for ($i = $start + 2; $i <= $end; $i++) {
+            $c[$i] = min($c[$i - 2] + $cost[$i], $c[$i - 1]);
+        }
+        print_r($c);
+        return $c[$i - 1];
+    }
+
 
 }
