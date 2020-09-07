@@ -1,8 +1,66 @@
 <?php
 
+/**
+ * Class PriorityQueue 小顶堆 ->insert($sth, $priority);
+ * SplPriorityQueue默认是大顶堆
+ * SplHeap只有数字排序
+ */
+class PriorityQueue extends \SplPriorityQueue
+{
+    public function compare($priority1, $priority2)
+    {
+        return $priority2 - $priority1;
+    }
+}
+
 class Solution
 {
-    
+    /**
+     * 347. 前 K 个高频元素
+     * topk （前k大）用小根堆，维护堆大小不超过 k 即可。每次压入堆前和堆顶元素比较，如果比堆顶元素还小，直接扔掉，否则压入堆。
+     * 检查堆大小是否超过 k，如果超过，弹出堆顶。复杂度是 nlogk
+     * 避免使用大根堆，因为你得把所有元素压入堆，复杂度是 nlogn，而且还浪费内存。如果是海量元素，那就挂了。
+     * 求前 k 大，用小根堆，求前 k 小，用大根堆。
+     * php提供的数据结构，很可以用用！
+     * @param Integer[] $nums
+     * @param Integer $k
+     * @return Integer[]
+     */
+    function topKFrequent($nums, $k)
+    {
+        # 优化，用小顶堆
+        //@todo
+
+        # 大顶堆  O(n log n)
+        if (!$nums || !$k) return 0;
+        $count = array_count_values($nums);
+        $pq = new SplPriorityQueue();
+        foreach ($count as $num => $freq) {
+            $pq->insert($num, $freq);
+        }
+        $ans = [];
+        for ($i = 0; $i < $k; ++$i) {
+            $ans[] = $pq->extract();
+        }
+
+        return $ans;
+
+        # 数组做法
+        if (!$nums || !$k) return 0;
+        foreach ($nums as $num) {
+            isset($map[$num]) ? $map[$num]++ : $map[$num] = 1;
+        }
+        arsort($map);
+        // print_r($map);
+        $r = [];
+        $i = 1;
+        foreach ($map as $v => $c) {
+            $r[] = $v;
+            if ($i++ == $k) break;
+        }
+        return $r;
+    }
+
     /**
      * 剑指 Offer 20. 表示数值的字符串
      * return is_numeric(trim($s));
