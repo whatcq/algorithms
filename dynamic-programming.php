@@ -705,4 +705,56 @@ class Solution
         return $dp[$i - 1];
     }
 
+    /**
+     * 77. 组合
+     * 感觉很简单一个题！怎么卡住了？不知怎么写。。多重循环是bfs
+     * 先想好用dfs还是bfs？
+     * @todo 回头再捋一捋
+     * @param Integer $n
+     * @param Integer $k
+     * @return Integer[][]
+     */
+    function combine($n, $k)
+    {
+        // 特殊情况
+        if ($k > $n || !$k || !$n) return [];
+        $range = range(1, $n);
+        if ($n == $k) return [$range];
+        if ($k == 1) {
+            foreach ($range as &$item) {
+                $item = [$item];
+            }
+            return $range;
+        }
+
+        # 递归
+        $this->combineDFS($n, $k);
+        return $this->result;
+
+        # C(m,n)=C(m-1,n)+C(m-1,n-1) 这个更高级
+        $ans = $this->combine($n - 1, $k);
+        foreach ($this->combine($n - 1, $k - 1) as $item) {
+            $item[] = $n;
+            $ans[] = $item;
+        }
+        return $ans;
+    }
+
+    private $result = [];
+
+    function combineDFS($n, $k, $start = 1, $picks = [], $length = 0)
+    {
+        //start并不是length!
+        //echo count($picks)==$start-1 ? 'Y':'N';
+        if ($length == $k) {
+            $this->result[] = $picks;
+            return;
+        }
+
+        // 此时剩余可选数字个数 $n - $i + 1
+        // 所需数字个数 $k - $length
+        for ($i = $start; $n - $i + 1 >= $k - $length; $i++) {
+            $this->combineDFS($n, $k, $i + 1, array_merge($picks, [$i]), $length + 1);
+        }
+    }
 }
