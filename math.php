@@ -3,6 +3,83 @@
 class Solution
 {
     /**
+     * 两数相除
+     * -2147483648/-1 = 2147483647
+     * 没想到挺复杂
+     * @param Integer $dividend
+     * @param Integer $divisor
+     * @return Integer
+     */
+    function divide($dividend, $divisor)
+    {
+        $INT_MAX = 0x7FFFFFFF;
+        //$MIN_INT = -($INT_MAX + 1);
+        if ($divisor == 1) return $dividend;//特殊情况
+        if ($divisor == -1) {
+            if ($dividend > -($INT_MAX + 1)) return -$dividend;// 整数范围内
+            return $INT_MAX;
+        }
+
+        $fu = ($dividend < 0 xor $divisor < 0);//xor运算符优先级比=低，必须加括号
+        $dividend < 0 && $dividend = -$dividend;
+        $divisor < 0 && $divisor = -$divisor;
+        $r = $this->div($dividend, $divisor);
+        return $fu ? -$r : ($r > $INT_MAX ? $INT_MAX : $r);
+
+        # 缓存各倍数，循环搞定
+        for ($i = $divisor; $i <= $dividend; $i = $i + $i) $exp[] = $i;
+        $res = 0;
+        $count = count($exp);
+        for ($i = $count - 1; $i >= 0; $i--) {
+            if ($dividend >= $exp[$i]) {
+                $dividend -= $exp[$i];
+                $res += 1 << $i;
+            }
+        }
+    }
+
+    // 分出一个函数更好，没有了负数判断
+    function div($dividend, $divisor)
+    {
+        if ($dividend < $divisor) return 0;
+        $r = 1;
+        $ji = $divisor;
+        while (($jiX2 = $ji + $ji) <= $dividend) {
+            $r += $r;
+            $ji = $jiX2;//不断翻倍
+        }
+        return $r + $this->divide($dividend - $ji, $divisor);
+    }
+
+    /**
+     * x 的平方根
+     * @param Integer $x
+     * @return Integer
+     */
+    function mySqrt($x)
+    {
+        # 二分法搜索，快些
+        if ($x == 0 || $x == 1) return $x;
+        $left = 1;
+        $right = $x / 2;
+        while ($left <= $right) {
+            //$mid = intval(($right + $left) / 2);
+            $mid = ($right + $left) >> 1;
+            if ($mid * $mid > $x) {
+                $right = $mid - 1;
+            } else {
+                $left = $mid + 1;
+            }
+        }
+        return $right;
+
+        # 顺序搜索，平方很快的，这方式慢不了多少，简单快捷
+        $y = 1;
+        while ($x >= $y * $y) $y++;
+        return $y - 1;
+    }
+
+    /**
      * 50. Pow(x, n)
      * 这么简单的一个做过的题目，咋不会了？
      * @param Float $x

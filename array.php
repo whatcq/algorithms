@@ -2,6 +2,70 @@
 
 class Solution
 {
+
+    /**
+     * 递增的三元子序列
+     * @param Integer[] $nums [1,0,-1,0,2, -3]
+     * @return Boolean true
+     */
+    function increasingTriplet($nums)
+    {
+        # 简单来源于巧妙，只能这样？
+        if (count($nums) < 3) return false;
+        $min = $second = PHP_INT_MAX;
+        foreach ($nums as $num) {
+            if ($num <= $min) $min = $num;
+            elseif ($num <= $second) $second = $num;
+            else return true;
+        }
+        return false;
+
+        # 题意：没说连续的3个数，问题来了，比较的基准在哪？k-v一起比较，很难
+        asort($nums);
+        print_r($nums);
+        $c = 1;
+        $prevK = key($nums);
+        next($nums);
+        foreach ($nums as $k => $v) {
+            if ($k > $prevK) {
+                if ($v > $nums[$prevK]) {
+                    echo "- $k $c\n";
+                    if ($c++ == 2) return true;
+                    $prevK = $k;
+                }
+            } else $prevK = $k;
+        }
+        return false;
+    }
+
+    /**
+     * 炸弹人
+     * @param Integer[][] $matrix
+     * @return NULL
+     */
+    function setZeroes(&$matrix)
+    {
+        if (!$matrix) return;
+        $emptyRow = array_fill(0, count($matrix[0]), 0);
+        $emptyCols = [];
+        $i = 0;
+        foreach ($matrix as $i => &$row) {
+            $empty = false;
+            foreach ($row as $j => $num) {
+                if (!$num) {
+                    $emptyCols[] = $j;
+                    $empty = true;
+                }
+            }
+            if ($empty) $row = $emptyRow;
+        }
+        foreach ($emptyCols as $emptyCol) {
+            for ($j = 0; $j <= $i; $j++) {
+                $matrix[$j][$emptyCol] = 0;
+            }
+        }
+    }
+
     /**
      * 原地旋转图像
      * 不难；序号、点位和循环次数，挺难理，易错调很久。。
@@ -292,7 +356,7 @@ class Solution
         }
         return $ans;
     }
-    
+
     /**
      * 避免重复字母的最小删除成本
      * 很简单一个题，判断边界得整理好套路!
@@ -319,7 +383,7 @@ class Solution
             //echo "$i => $t $s[$i] ==> $c, $max\n";
         }
         return $c - $max;
-        
+
         $c = $start = $end = 0;
         for ($i = 1, $n = strlen($s); $i < $n; $i++) {
             if ($s[$i] == $s[$start]) $end = $i;
@@ -356,6 +420,4 @@ class Solution
         print_r($c);
         return $c[$i - 1];
     }
-
-
 }

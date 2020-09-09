@@ -4,6 +4,28 @@ require_once 'node-tree-map.lib.php';
 
 class Solution
 {
+
+    /**
+     * 160. 相交链表
+     * 很有意思，想不到就不简单
+     * A,B同时遍历，遍历完了就到对方开头继续，A+B==B+A，那么至少在最后null可以相等
+     * A=x+z,B=y+z，那么A+y==B+x,在交点遇到。
+     * @param ListNode $headA
+     * @param ListNode $headB
+     * @return ListNode
+     */
+    function getIntersectionNode($headA, $headB)
+    {
+        if (!$headA || !$headB) return null;
+        $a = $headA;
+        $b = $headB;
+        while ($a !== $b) {//全等才行，否则不是同一个对象
+            $a = $a ? $a->next : $headB;
+            $b = $b ? $b->next : $headA;
+        }
+        return $a;
+    }
+
     private $paths = [];
 
     /**

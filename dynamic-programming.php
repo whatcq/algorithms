@@ -753,7 +753,7 @@ class Solution
 
         // 此时剩余可选数字个数 $n - $i + 1
         // 所需数字个数 $k - $length
-        for ($i = $start; $n - $i + 1 >= $k - $length; $i++) {
+        for ($i = $start; $n - $i + 1 >= $k - $length; $i++) {//我的思路：i<=n-k+1-length
             $this->combineDFS($n, $k, $i + 1, array_merge($picks, [$i]), $length + 1);
         }
     }

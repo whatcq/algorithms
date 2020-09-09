@@ -684,13 +684,6 @@ class Solution
     }
 }
 
-function p($ditu)
-{
-    foreach ($ditu as $j => $row) {
-        echo implode(' ', $row), "\n";
-    }
-    echo "\n";
-}
 
 //$ditu = [["X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X"],["X","X","X","X","X","X","X","X","X","O","O","O","X","X","X","X","X","X","X","X"],["X","X","X","X","X","O","O","O","X","O","X","O","X","X","X","X","X","X","X","X"],["X","X","X","X","X","O","X","O","X","O","X","O","O","O","X","X","X","X","X","X"],["X","X","X","X","X","O","X","O","O","O","X","X","X","X","X","X","X","X","X","X"],["X","X","X","X","X","O","X","X","X","X","X","X","X","X","X","X","X","X","X","X"]];
 //p($ditu);
