@@ -425,16 +425,17 @@ class Solution
     /**
      * 236. 二叉树的最近公共祖先（区别：必须要找到；搜索树是有序的，只用看范围比大小）
      * root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 4 输出: 5
-     * @param TreeNode $root
+     * @param TreeNode $root 因为递归，改为$node表意更好
      * @param TreeNode $p
      * @param TreeNode $q
      * @return TreeNode|null
      */
     function lowestCommonAncestor($root, $p, $q)
     {
-        // 不要用=== @see https://www.php.net/manual/zh/language.oop5.object-comparison.php
+        // 不要用===，那表示地址也相同 @see https://www.php.net/manual/zh/language.oop5.object-comparison.php
         // 在左右子树找到p或q，再最终判断，这个思路很高级啊！一般只会想找一个。。然后不容易理清。。
         if (!$root || $root == $q || $root == $p) return $root;
+        // left,right是相对于当前节点，层层下推的，并非只是根节点的left,right
         $left = $this->lowestCommonAncestor($root->left, $p, $q);
         $right = $this->lowestCommonAncestor($root->right, $p, $q);
         // 三元表达式 组合，不加括号的话总是记不住优先顺序。。

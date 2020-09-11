@@ -706,13 +706,44 @@ class Solution
     }
 
     /**
+     * 40. 组合总和 II
+     * 竟然乱试做对了，还100%
+     * @param Integer[] $candidates
+     * @param Integer $target
+     * @return Integer[][]
+     */
+    function combinationSum2($candidates, $target)
+    {
+        sort($candidates);
+        return $this->combinationSum2DFS($candidates, $target, []);
+    }
+
+    function combinationSum2DFS($candidates, $target, $ans = [])
+    {
+        $r = [];
+        $last = end($ans);
+        $prev = null;
+        foreach ($candidates as $i => $x) {
+            if ($x < $last) continue;//组合过滤i<j,前面已经组合后面的，后面不能再组合前面的
+            if ($x === $prev) continue;//重复过滤,另外：选择的数可以用pos来定位
+            $prev = $x;
+            if ($x < $target) {
+                unset($candidates[$i]);
+                $r = array_merge($r, $this->combinationSum2DFS($candidates, $target - $x, array_merge($ans, [$x])));
+            } elseif ($x == $target) $r[] = array_merge($ans, [$x]);
+            else break;
+        }
+        return $r;
+    }
+
+    /**
      * 77. 组合
      * 感觉很简单一个题！怎么卡住了？不知怎么写。。多重循环是bfs
      * 先想好用dfs还是bfs？
-     * @todo 回头再捋一捋
      * @param Integer $n
      * @param Integer $k
      * @return Integer[][]
+     * @todo 回头再捋一捋
      */
     function combine($n, $k)
     {
@@ -731,7 +762,8 @@ class Solution
         $this->combineDFS($n, $k);
         return $this->result;
 
-        # C(m,n)=C(m-1,n)+C(m-1,n-1) 这个更高级
+        # C(m,n)=C(m-1,n)+C(m-1,n-1) 公式高级
+        # 小王是亲戚，他不去则另外人里选n；他要去则另外人里选n-1
         $ans = $this->combine($n - 1, $k);
         foreach ($this->combine($n - 1, $k - 1) as $item) {
             $item[] = $n;

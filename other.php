@@ -28,12 +28,24 @@ class Solution
      */
     function topKFrequent($nums, $k)
     {
-        # 优化，用小顶堆
-        //@todo
-
-        # 大顶堆  O(n log n)
         if (!$nums || !$k) return 0;
         $count = array_count_values($nums);
+
+        # 优化，用小顶堆
+        $pq = new PriorityQueue();
+        foreach ($count as $num => $freq) {
+            if ($freq >= $pq->top()) {
+                $pq->insert($num, $freq);
+                if ($pq->count() > $k) $pq->extract();
+            }
+        }
+        $ans = [];
+        foreach ($pq as $item) {
+            array_unshift($ans, $item);
+        }
+        return $ans;
+
+        # 大顶堆  O(n log n)
         $pq = new SplPriorityQueue();
         foreach ($count as $num => $freq) {
             $pq->insert($num, $freq);
