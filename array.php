@@ -4,6 +4,54 @@ class Solution
 {
 
     /**
+     * 17.电话号码的字母组合
+     * 记住这个套路，以前这么写，后来又忘了。。
+     * @param String $digits
+     * @return String[]
+     */
+    function letterCombinations($digits)
+    {
+        $map = [
+            '2' => ['a', 'b', 'c'],
+            '3' => ['d', 'e', 'f'],
+            '4' => ['g', 'h', 'i'],
+            '5' => ['j', 'k', 'l'],
+            '6' => ['m', 'n', 'o'],
+            '7' => ['p', 'q', 'r', 's'],
+            '8' => ['t', 'u', 'v'],
+            '9' => ['w', 'x', 'y', 'z']
+        ];
+        if (!isset($map[$digits[0]])) return [];
+        $r = $map[$digits[0]];
+        for ($i = 1, $n = strlen($digits); $i < $n; $i++) {
+            $_r = [];
+            foreach ($r as $item) {
+                foreach ($map[$digits[$i]] as $char) {
+                    $_r[] = $item . $char;
+                }
+            }
+            $r = $_r;
+        }
+        return $r;
+    }
+
+    function findPeakElement($nums)
+    {
+        // 二分法找峰值，正规操作
+        $l = 0;
+        $r = count($nums) - 1;
+        while ($l < $r) {
+            $m = ($l + $r) >> 1;
+            if ($nums[$m] < $nums[$m + 1]) $l = $m + 1;
+            else $r = $m;
+        }
+        return $l;
+        // 语言函数，取巧了..
+        $max = max($nums);
+        return array_search($max, $nums);
+    }
+
+    /**
      * 递增的三元子序列
      * @param Integer[] $nums [1,0,-1,0,2, -3]
      * @return Boolean true
@@ -201,34 +249,6 @@ class Solution
         $arr[$j]=$tmp;
     };
     */
-    /**
-     * 前面值选好了，后面的依次追加，这样递归
-     * @param int $start 开始点
-     * @param array $path 选上的value
-     * @param array $nums 原参数
-     * @param $n
-     * @param $r
-     * @param $paths
-     */
-    function dfs($start, $path, $nums, $n, &$r, &$paths)
-    {
-        if (count($path) > 1) {
-            $_path = implode('-', $path);
-            if (!isset($paths[$_path])) {
-                $r[] = $path;
-                $paths[$_path] = 0;
-            }
-        }
-        for ($i = $start; $i < $n; $i++) {
-            $prev = end($path);
-            $cur = $nums[$i];
-            if (!$path || $prev <= $cur) {
-                $path[] = $cur;
-                $this->dfs($i + 1, $path, $nums, $n, $r, $paths);
-                array_pop($path);
-            }
-        }
-    }
 
 
     /**

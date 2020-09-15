@@ -106,6 +106,7 @@ class Solution
         return $max;
     }
 
+
     /**
      * 买卖股票的最佳时机
      * 没理清如何简化问题。。
@@ -244,7 +245,7 @@ class Solution
 
         // 选左边 或 右边 能否赢
         return $this->play($nums, 1, $n - 1, $nums[0], 0)
-            || $this->play($nums, 0, $n - 2, $nums[$n - 1], 0);
+        || $this->play($nums, 0, $n - 2, $nums[$n - 1], 0);
     }
 
     private $half;
@@ -315,7 +316,7 @@ class Solution
             if ($r - $x == $m) $count--;//这里仔细才能捋清
             if ($r - $l + 1 == $m) $count++;//当前无论是否合并后，连成的长度
             if ($count > 0) $step = $i + 1;//记录或更新含有m长度的步骤
-            $link[$l] = $r;
+            $link[$l] = $r;//合并后原来的link可以删除，但无所谓啦
             $link[$r] = $l;
             //$str[$arr[$i] - 1] = '1';
             //echo "$str=====$i\n";
@@ -350,6 +351,7 @@ class Solution
                 //echo "$l $r\n";
             }
             //l>=middle,
+            //数据结构是 [start1, end1, start2, end2, ...]两两一组，所以需要处理
             if ($l % 2) {
                 $l--;
                 $r--;
@@ -367,7 +369,7 @@ class Solution
             //echo "$str=====$i\n";
             //echo implode(" ", $range), "\n";
 
-            //======顺序搜索
+            //======顺序搜索：数据结构：[start1 => end1, start2 => end2, ...]
             // foreach ($range as $start => $end) {
             //     if ($cur >= $start && $cur <= $end) {
             //         if ($m == $cur - $start || $m == $end - $cur) return $i;
@@ -483,6 +485,9 @@ class Solution
 
     /**
      * 491. 递增子序列
+     * 给定一个整型数组, 你的任务是找到所有该数组的递增子序列，递增子序列的长度至少是2。
+     * 输入: [4, 6, 7, 7]
+     * 输出: [[4, 6], [4, 7], [4, 6, 7], [4, 6, 7, 7], [6, 7], [6, 7, 7], [7,7], [4,7,7]]
      * 感觉简单，代码流程迟迟整理不出来：因为跳跃交叉的情况如何展开成一维算法？
      * @param Integer[] $nums
      * @return Integer[][]
@@ -492,7 +497,8 @@ class Solution
         $r = [];
         $paths = [];
         $n = count($nums);
-        $this->dfs(0, [], $nums, $n, $r, $paths);
+        // 传地址的方式可以避免 `$this->` 的繁琐写法
+        $this->findSubsequencesDFS(0, [], $nums, $n, $r, $paths);
         return $r;
 
         #根据实例来推运算过程，漏解
@@ -535,6 +541,35 @@ class Solution
 
         }
         return $r;
+    }
+
+    /**
+     * 前面值选好了，后面的依次追加，这样递归
+     * @param int $start 开始点
+     * @param array $path 选上的value
+     * @param array $nums 原参数
+     * @param $n
+     * @param $r
+     * @param $paths
+     */
+    function findSubsequencesDFS($start, $path, $nums, $n, &$r, &$paths)
+    {
+        if (count($path) > 1) {
+            $_path = implode('-', $path);
+            if (!isset($paths[$_path])) {
+                $r[] = $path;
+                $paths[$_path] = 0;
+            }
+        }
+        for ($i = $start; $i < $n; $i++) {
+            $prev = end($path);
+            $cur = $nums[$i];
+            if (!$path || $prev <= $cur) {
+                $path[] = $cur;
+                $this->findSubsequencesDFS($i + 1, $path, $nums, $n, $r, $paths);
+                array_pop($path);
+            }
+        }
     }
 
     /*
@@ -788,5 +823,45 @@ class Solution
         for ($i = $start; $n - $i + 1 >= $k - $length; $i++) {//我的思路：i<=n-k+1-length
             $this->combineDFS($n, $k, $i + 1, array_merge($picks, [$i]), $length + 1);
         }
+    }
+
+    /**
+     * 79. 单词搜索
+     * 很简单的一个回溯题，具象一点的题好做一点，记住这个写法
+     * @param String[][] $board
+     * @param String $word
+     * @return Boolean
+     */
+    function exist($board, $word)
+    {
+        foreach ($board as $i => $line) {
+            foreach ($line as $j => $v) {
+                if ($v == $word[0]) {
+                    if (!isset($word[1])) return true;
+                    if ($this->explore($board, $word, $i, $j)) return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    function explore($board, $word, $i, $j, $map = [], $index = 1)
+    {
+        $map[$i][$j] = 0;
+        foreach ([[0, 1], [0, -1], [1, 0], [-1, 0]] as list($x, $y)) {
+            $_i = $i + $x;
+            $_j = $j + $y;
+            if (isset($board[$_i][$_j])
+                && !isset($map[$_i][$_j])
+                && $board[$_i][$_j] == $word[$index]
+            ) {
+                if (isset($word[$index + 1])) {
+                    if ($this->explore($board, $word, $_i, $_j, $map, $index + 1)) return true;
+                } else {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

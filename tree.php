@@ -5,6 +5,38 @@ require_once 'node-tree-map.lib.php';
 class Solution
 {
 
+    private $r = [];
+
+    /**
+     * 94. 二叉树的中序遍历
+     * @param TreeNode $root
+     * @return Integer[]
+     */
+    function inorderTraversal($root)
+    {
+        # 迭代法 思路如何捋清楚？
+        $stack = $r = [];
+        $p = $root;
+        while ($p || $stack) {
+            if ($p) {
+                $stack[] = $p;
+                $p = $p->left;
+            } else {
+                $p = array_pop($stack);
+                $r[] = $p->val;
+                $p = $p->right;
+            }
+        }
+        return $r;
+
+        # 递归法 简单
+        if (!$root) return [];
+        $this->inorderTraversal($root->left);
+        $this->r[] = $root->val;
+        $this->inorderTraversal($root->right);
+        return $this->r;
+    }
+
     /**
      * 160. 相交链表
      * 很有意思，想不到就不简单
@@ -241,8 +273,8 @@ class Solution
         if ($leftChild == null || $rightChild == null) return false;
 
         return $leftChild->val == $rightChild->val
-            && $this->isSymmetricHelper($leftChild->left, $rightChild->right)
-            && $this->isSymmetricHelper($leftChild->right, $rightChild->left);
+        && $this->isSymmetricHelper($leftChild->left, $rightChild->right)
+        && $this->isSymmetricHelper($leftChild->right, $rightChild->left);
     }
 
     /**
@@ -357,7 +389,7 @@ class Solution
         if (!is_null($min) && $root->val <= $min) return false;
         if (!is_null($max) && $root->val >= $max) return false;
         return $this->isValidBST($root->left, $min, $root->val)
-            && $this->isValidBST($root->right, $root->val, $max);
+        && $this->isValidBST($root->right, $root->val, $max);
 
         # 中序遍历 
         return $this->inOrder($root);
@@ -455,8 +487,8 @@ class Solution
         # 缺点：level对同一节点会重复计算
         if (!$root) return true;
         return $this->isBalanced($root->left)
-            && $this->isBalanced($root->right)
-            && abs($this->level($root->left) - $this->level($root->right)) <= 1;
+        && $this->isBalanced($root->right)
+        && abs($this->level($root->left) - $this->level($root->right)) <= 1;
     }
 
     function level($root)

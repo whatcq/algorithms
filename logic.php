@@ -2,7 +2,7 @@
 
 class Solution
 {
-    
+
     /**
      * 1567. 乘积为正数的最长子数组长度
      * 正负交换 的思路没想到，这里没有理清楚；所以想到dfs，但又意识到不对，因为正负数都是在线性积累的
@@ -244,6 +244,7 @@ class Solution
         //echo "dp[$l][$r][$k]=>{$dp[$l][$r][$k]}\n";
         return $this->kv([$l, $r, $k]);
     }
+
     /**
      * 43.字符串相乘
      * 业务最好懂，理顺没要太多时间
@@ -321,6 +322,40 @@ class Solution
             //print_r($sum);
         }
         return implode('', array_reverse($sum));
+    }
+
+    /**
+     * 括号生成
+     * @param Integer $n
+     * @return String[]
+     */
+    function generateParenthesis($n)
+    {
+        # 按括号序列的长度递归 (a)b形式，高级，没懂
+        if ($n === 0) return [''];
+        elseif ($n === 1) return ['()'];
+        $ans = [];
+        for ($i = 0; $i < $n; ++$i) {
+            foreach ($this->generateParenthesis($i) as $left) {
+                foreach ($this->generateParenthesis($n - $i - 1) as $right) {
+                    $ans[] = '(' . $left . ')' . $right;
+                }
+            }
+        }
+        return $ans;
+
+        # 我的压栈法
+        $this->combine($n - 1, $n, '(');
+        return $this->r;
+    }
+
+    private $r = [];
+
+    function combine($a, $b, $str)
+    {
+        if ($a == 0) return $this->r[] = $str . str_repeat(')', $b);
+        $this->combine($a - 1, $b, $str . '(');
+        if ($a < $b) $this->combine($a, $b - 1, $str . ')');
     }
 
     /**
@@ -620,7 +655,7 @@ class Solution
         $add && $p = '1' . $p;
         return $p;
     }
-    
+
     private $maze = ["S#O", "M..", "M.T"];
     private $m;
     private $n;
