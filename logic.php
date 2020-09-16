@@ -1,5 +1,7 @@
 <?php
 
+require_once 'function.php';
+
 class Solution
 {
 
@@ -717,8 +719,66 @@ class Solution
         });
         return $try ? min($try) : -1;
     }
+
+    /**
+     * 37. 解数独
+     * 逻辑很简单，关键怎么写这个dfs
+     * @param String[][] $board
+     * @return NULL
+     */
+    function solveSudoku(&$board)
+    {
+        //findEasyPoint
+        $empty = [];
+        $row = $col = $grid = [];
+        foreach ($board as $i => $line) {
+            foreach ($line as $j => $v) {
+                if ($v != '.') {
+                    $row[$i][$v] = 0;
+                    $col[$j][$v] = 0;
+                    $grid[intval($i / 3) + 3 * intval($j / 3)][$v] = 0;
+                } else {
+                    $empty[] = [$i, $j];
+                }
+            }
+        }
+        //把空位依次尝试
+        $this->trySet($board, $row, $col, $grid, $empty, 0);
+        echo "循环统计：$this->count\n";
+        return $board;
+    }
+
+    public $count = 0;
+    // 本来以为这是暴力法费时间，没想到就是这样。。优化就是位运算，缓存possibleValues
+    // 我真是想多了，以为这是困难题就需要至少代码很复杂，（解题代码也复杂）
+    function trySet(&$board, &$row, &$col, &$grid, &$empty, $index = 0)
+    {
+        $this->count++;
+        list($i, $j) = $empty[$index];
+        $g = intval($i / 3) + 3 * intval($j / 3);
+        for ($k = 1; $k <= 9; $k++) {
+            if (isset($row[$i][$k]) || isset($col[$j][$k]) || isset($grid[$g][$k])) continue;
+            $board[$i][$j] = "$k";
+            $row[$i][$k] = 0;
+            $col[$j][$k] = 0;
+            $grid[$g][$k] = 0;
+            if (!isset($empty[$index + 1])) return true;
+            elseif ($this->trySet($board, $row, $col, $grid, $empty, $index + 1)) return true;
+            unset($row[$i][$k]);//回溯
+            unset($col[$j][$k]);
+            unset($grid[$g][$k]);
+        }
+        $board[$i][$j] = '.';
+        return false;
+    }
 }
 
+$board = [["5", "3", ".", ".", "7", ".", ".", ".", "."], ["6", ".", ".", "1", "9", "5", ".", ".", "."], [".", "9", "8", ".", ".", ".", ".", "6", "."], ["8", ".", ".", ".", "6", ".", ".", ".", "3"], ["4", ".", ".", "8", ".", "3", ".", ".", "1"], ["7", ".", ".", ".", "2", ".", ".", ".", "6"], [".", "6", ".", ".", ".", ".", "2", "8", "."], [".", ".", ".", "4", "1", "9", ".", ".", "5"], [".", ".", ".", ".", "8", ".", ".", "7", "9"]];
+//$board = array_fill(0, 9, array_fill(0, 9, '.'));
+p($board);//die;
+(new Solution())->solveSudoku($board);
+p($board);
+die;
 
 //$ditu = [["X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X","X"],["X","X","X","X","X","X","X","X","X","O","O","O","X","X","X","X","X","X","X","X"],["X","X","X","X","X","O","O","O","X","O","X","O","X","X","X","X","X","X","X","X"],["X","X","X","X","X","O","X","O","X","O","X","O","O","O","X","X","X","X","X","X"],["X","X","X","X","X","O","X","O","O","O","X","X","X","X","X","X","X","X","X","X"],["X","X","X","X","X","O","X","X","X","X","X","X","X","X","X","X","X","X","X","X"]];
 //p($ditu);
