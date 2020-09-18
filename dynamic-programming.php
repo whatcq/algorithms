@@ -826,6 +826,35 @@ class Solution
     }
 
     /**
+     * 47. 全排列 II
+     *
+     * @param Integer[] $nums
+     * @return Integer[][]
+     */
+    function permuteUnique($nums)
+    {
+        sort($nums);
+        $this->permute($nums, 0, count($nums) - 1);
+        return $this->r;
+    }
+
+    private $r = [];
+
+    function permute($nums, $left, $right)
+    {
+        if ($left == $right) return $this->r[] = $nums;
+
+        //没搞懂
+        for ($i = $left; $i <= $right; $i++) {
+            if ($i != $left && $nums[$left] == $nums[$i]) continue;
+            $tmp = $nums[$i];
+            $nums[$i] = $nums[$left];
+            $nums[$left] = $tmp;
+            $this->permute($nums, $left + 1, $right);
+        }
+    }
+
+    /**
      * 79. 单词搜索
      * 很简单的一个回溯题，具象一点的题好做一点，记住这个写法
      * @param String[][] $board
