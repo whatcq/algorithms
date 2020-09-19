@@ -840,11 +840,17 @@ class Solution
 
     private $r = [];
 
+    /**
+     * 全排列套路：循环，依次选出一个放到第一位(交换)，剩下的继续全排列
+     * 公式：A(n, m)=A(n, 1)A(n-1, m)=nA(n-1, m)
+     * @param $nums
+     * @param $left
+     * @param $right int 只是记录右边界
+     * @return mixed
+     */
     function permute($nums, $left, $right)
     {
         if ($left == $right) return $this->r[] = $nums;
-
-        //没搞懂
         for ($i = $left; $i <= $right; $i++) {
             if ($i != $left && $nums[$left] == $nums[$i]) continue;
             $tmp = $nums[$i];

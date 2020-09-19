@@ -131,4 +131,65 @@ class Solution
         }
         return $num . implode('', $nums);
     }
+
+    /**
+     * LCP 22. 黑白方格画
+     * @param Integer $n
+     * @param Integer $k
+     * @return Integer
+     */
+    function paintingPlan($n, $k)
+    {
+        if (!$k || $k == $n * $n) return 1;
+        if ($k < $n || $k > $n * $n) return 0;
+
+        # 组合计算
+        //1横2竖，2横1竖，组合情况并不交叉，我没想清楚
+        //(4,12)两种情况[0,3], [2,2]
+        $c = 0;
+        for ($i = 0; $i < $n; $i++) {
+            for ($j = 0; $j < $n; $j++) {
+                $total = $n * ($i + $j) - $i * $j;//黑格子数-重复交点
+                if ($total == $k) $c += $this->C($n, $i) * $this->C($n, $j);
+                elseif ($total > $k) break;
+            }
+        }
+        return $c;
+
+        # 动态规划，没懂思路：把全部i横j竖对应的??数缓存起来。
+        $bin = array_fill(0, $n + 1, array_fill(0, $n + 1, 0));
+        for ($i = 0; $i <= $n; $i++) {
+            for ($j = $bin[$i][0] = 1; $j <= $i; $j++) {
+                $bin[$i][$j] = $bin[$i - 1][$j - 1] + $bin[$i - 1][$j];
+            }
+        }
+        $cnt = 0;
+        for ($l = 0; $l < $n; ++$l) for ($r = 0; $r < $n; ++$r) {
+            if (($n - $l) * ($n - $r) == $n * $n - $k) {
+                $cnt += $bin[$n][$l] * $bin[$n][$r];
+            }
+        }
+        return $cnt;
+    }
+
+    // 组合数
+    function C($n, $m)
+    {
+        $ret = 1;
+        for ($i = 1; $i <= $m; $i++) {
+            $ret *= ($n + 1 - $i) / $i;//排列数则不除以$i
+        }
+        return $ret;
+    }
+
+    // 阶乘
+    function factorial($n)
+    {
+        if ($n == 0) return 1;
+        $N = 1;
+        while ($n--) {
+            $N *= $n;
+        }
+        return $N;
+    }
 }
