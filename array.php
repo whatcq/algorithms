@@ -4,6 +4,38 @@ class Solution
 {
 
     /**
+     * 78. 子集
+     * @param Integer[] $nums
+     * @return Integer[][]
+     */
+    function subsets($nums) {
+        #迭代法
+        $result = [[]];
+        foreach ($nums as $num) {
+            foreach ($result as $item) {
+                $result[] = array_merge($item, [$num]);
+            }
+        }
+        return $result;
+        
+        #位运算 这么简单一个题，我想了这么个高级方法，服了自己。。
+        $r = [[]];
+        $n = count($nums);
+        for($i = 1, $l = 1 << $n; $i < $l; $i++) {
+            $sub = [];
+            $bit = $i;
+            $j = 1;
+            do {
+                if ($bit % 2)array_unshift($sub, $nums[$n - $j]);
+                $bit >> = 1;
+                $j++;
+            }while ($bit);
+            $r[] = $sub;
+        }
+        return $r;
+    }
+
+    /**
      * 17.电话号码的字母组合
      * 记住这个套路，以前这么写，后来又忘了。。
      * @param String $digits
