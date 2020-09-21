@@ -37,6 +37,35 @@ class Solution
         return $this->r;
     }
 
+    private $sum = 0;
+    /**
+     * 538. 把二叉搜索树转换为累加树
+     * @param TreeNode $root
+     * @return TreeNode
+     */
+    function convertBST($root) {
+        #后序遍历 写法 记住
+        if(!$root)return null;
+        if($root->right)$this->convertBST($root->right);
+        $root->val += $this->num;
+        $this->num = $root->val;
+        if($root->left)$this->convertBST($root->left);
+        return $root;
+
+        #值不断传入传出
+        $this->handle($root);
+        return $root;
+    }
+
+    function handle($root, $add = 0)
+    {
+        if($root->right)$add = $this->handle($root->right, $add);
+        $root->val += $add;
+        $add = $root->val;
+        if($root->left)return $this->handle($root->left, $add);
+        return $add;
+    }
+
     /**
      * 160. 相交链表
      * 很有意思，想不到就不简单
