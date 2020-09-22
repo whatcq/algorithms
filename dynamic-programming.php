@@ -682,7 +682,35 @@ class Solution
         $this->f[$i] = $root->val + $this->g[$l] + $this->g[$r];
         $this->g[$i] = ($this->f[$l] > $this->g[$l] ? $this->f[$l] : $this->g[$l])
             + ($this->f[$r] > $this->g[$r] ? $this->f[$r] : $this->g[$r]);
-//        max($this->f[$l], $this->g[$l]) + max($this->f[$r], $this->g[$r]);
+        //max($this->f[$l], $this->g[$l]) + max($this->f[$r], $this->g[$r]);
+    }
+
+    //==============
+    private $total = 0;
+    /**
+     * 968. 监控二叉树 难在理清逻辑流程
+     *
+     * @param  TreeNode $root
+     * @return Integer
+     */
+    function minCameraCover($root) 
+    {
+        if(!$root) return 0 ;
+        if($this->minCameraCoverDFS($root)===0) $this->total++;
+        return $this->total;
+    }
+    function minCameraCoverDFS($root)
+    {
+        //当前节点3种状态
+        $l = $r = 2;//默认不用管！
+        if ($root->left) $l=$this->minCameraCoverDFS($root->left);
+        if ($root->right) $r=$this->minCameraCoverDFS($root->right);
+        if ($l===0 || $r===0) {
+            $this->total++;
+            return 1;//1：自己安监视器 
+        }
+        if ($l===1 || $r===1) return 2;//2：可被子女照看，故未装监视器 
+        return 0;//0：无子女照看，要么自己装，要么靠爹
     }
 
     /**
