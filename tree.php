@@ -38,18 +38,20 @@ class Solution
     }
 
     private $sum = 0;
+
     /**
      * 538. 把二叉搜索树转换为累加树
      * @param TreeNode $root
      * @return TreeNode
      */
-    function convertBST($root) {
+    function convertBST($root)
+    {
         #后序遍历 写法 记住
-        if(!$root)return null;
-        if($root->right)$this->convertBST($root->right);
+        if (!$root) return null;
+        if ($root->right) $this->convertBST($root->right);
         $root->val += $this->num;
         $this->num = $root->val;
-        if($root->left)$this->convertBST($root->left);
+        if ($root->left) $this->convertBST($root->left);
         return $root;
 
         #值不断传入传出
@@ -59,10 +61,10 @@ class Solution
 
     function handle($root, $add = 0)
     {
-        if($root->right)$add = $this->handle($root->right, $add);
+        if ($root->right) $add = $this->handle($root->right, $add);
         $root->val += $add;
         $add = $root->val;
-        if($root->left)return $this->handle($root->left, $add);
+        if ($root->left) return $this->handle($root->left, $add);
         return $add;
     }
 
@@ -339,40 +341,6 @@ class Solution
             $nodes = $children;
         }
         return $level;
-    }
-
-
-    /**
-     * 647. 回文子串
-     * @param String $s
-     * @return Integer
-     */
-    function countSubstrings($s)
-    {
-        # 中心扩展法
-        $total = 0;
-        for ($i = 0, $n = strlen($s); $i < $n; $i++) {
-            $start = $i;
-            $end = $i;
-            while ($start >= 0 && $end < $n && $s[$start--] == $s[$end++]) $total++;
-            $start = $i;
-            $end = $i + 1;
-            while ($start >= 0 && $end < $n && $s[$start--] == $s[$end++]) $total++;
-        }
-        return $total;
-
-        # 暴力法
-        for ($i = 2, $total = $n = strlen($s); $i <= $n; $i++) {//step
-            for ($j = 0; $j <= $n - $i; $j++) {
-                if ($s[$j] != $s[$j + $i - 1]) continue;
-                $_s = substr($s, $j, $i);
-                //echo "$_s\n";
-                if ($_s == strrev($_s)) {
-                    $total++;
-                }
-            }
-        }
-        return $total;
     }
 
     /**
@@ -745,5 +713,62 @@ class Solution
             $root->left = null;
         }
         return $root;
+    }
+
+    /**501. 二叉搜索树中的众数
+     * @param TreeNode $root
+     * @return Integer[]
+     */
+    function findMode($root)
+    {
+        if (!$root) return [];
+
+        #只记录历史和最值
+        $this->findModeInOrder($root);
+        //重复代码为了快点，过后判断，so最后还要处理一次
+        if ($this->count > $this->max) {
+            $this->r = [$this->cur];
+            $this->max = $this->count;
+        } elseif ($this->count == $this->max) $this->r[] = $this->cur;
+        return $this->r;
+
+
+        #使用额外空间统计，简单粗暴
+        $this->findModeDFS($root);
+        $r = [];
+        $max = max($this->map);
+        foreach ($this->map as $val => $c) {
+            if ($c == $max) $r[] = $val;
+        }
+        return $r;
+    }
+
+    private $r2 = [], $cur = null, $max = 0, $count = 0;
+
+    function findModeInOrder($node)
+    {
+        if ($node->left) $this->findModeInOrder($node->left);
+        if ($node->val === $this->cur) {
+            $this->count++;
+        } else {
+            //优化-过后判断
+            if ($this->count > $this->max) {
+                $this->r = [$this->cur];
+                $this->max = $this->count;
+            } elseif ($this->count == $this->max) $this->r[] = $this->cur;
+
+            $this->cur = $node->val;
+            $this->count = 1;
+        }
+        if ($node->right) $this->findModeInOrder($node->right);
+    }
+
+    private $map = [];
+
+    function findModeDFS($root)
+    {
+        isset($this->map[$root->val]) ? $this->map[$root->val]++ : $this->map[$root->val] = 1;
+        if ($root->left) $this->findModeDFS($root->left);
+        if ($root->right) $this->findModeDFS($root->right);
     }
 }

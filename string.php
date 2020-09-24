@@ -2,6 +2,40 @@
 
 class Solution
 {
+
+    /**
+     * 647. 回文子串
+     * @param String $s
+     * @return Integer
+     */
+    function countSubstrings($s)
+    {
+        # 中心扩展法
+        $total = 0;
+        for ($i = 0, $n = strlen($s); $i < $n; $i++) {
+            $start = $i;
+            $end = $i;
+            while ($start >= 0 && $end < $n && $s[$start--] == $s[$end++]) $total++;
+            $start = $i;
+            $end = $i + 1;
+            while ($start >= 0 && $end < $n && $s[$start--] == $s[$end++]) $total++;
+        }
+        return $total;
+
+        # 暴力法
+        for ($i = 2, $total = $n = strlen($s); $i <= $n; $i++) {//step
+            for ($j = 0; $j <= $n - $i; $j++) {
+                if ($s[$j] != $s[$j + $i - 1]) continue;
+                $_s = substr($s, $j, $i);
+                //echo "$_s\n";
+                if ($_s == strrev($_s)) {
+                    $total++;
+                }
+            }
+        }
+        return $total;
+    }
+
     private $len, $s;
 
     /**
