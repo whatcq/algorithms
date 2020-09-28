@@ -15,6 +15,7 @@ class Solution
     function inorderTraversal($root)
     {
         # 迭代法 思路如何捋清楚？
+        //用栈来保存先前走过的路径，以便可以在访问完子树后,可以利用栈中的信息,回退到当前节点的双亲节点,进行下一步操作。
         $stack = $r = [];
         $p = $root;
         while ($p || $stack) {
@@ -770,5 +771,104 @@ class Solution
         isset($this->map[$root->val]) ? $this->map[$root->val]++ : $this->map[$root->val] = 1;
         if ($root->left) $this->findModeDFS($root->left);
         if ($root->right) $this->findModeDFS($root->right);
+    }
+
+    /**
+     * 113. 路径总和 II
+     * @param TreeNode $root
+     * @param Integer $sum
+     * @return Integer[][]
+     */
+    function pathSum($root, $sum)
+    {
+        if (!$root) return [];
+        $r = [];
+        // 记住这种匿名函数写法，比新建方法简洁些
+        $callback = function ($node, $sum, $path) use (&$callback, &$r) {
+            $path[] = $node->val;
+            $sum -= $node->val;
+            if ($node->left) $callback($node->left, $sum, $path);
+            if ($node->right) $callback($node->right, $sum, $path);
+            if (!$node->left && !$node->right && 0 == $sum) $r[] = $path;
+        };
+        $callback($root, $sum, []);
+        return $r;
+    }
+
+    /**
+     * 二叉树的锯齿形层次遍历
+     * @param TreeNode $root
+     * @return Integer[][]
+     */
+    function zigzagLevelOrder($root)
+    {
+        if (!$root) return [];
+        $r = [];
+        // 还可以用SplQueue？array_reverse？也行。
+        $nodes = [$root];
+        $l_r = true;
+        while ($nodes) {
+            $_nodes = $_r = [];
+            if ($l_r) { //顺读顺加
+                foreach ($nodes as $node) {
+                    if ($node->left) $_nodes[] = $node->left;
+                    if ($node->right) $_nodes[] = $node->right;
+                    $_r[] = $node->val;
+                }
+            } else { //逆读逆加
+                while ($node = array_pop($nodes)) {
+                    if ($node->right) array_unshift($_nodes, $node->right);
+                    if ($node->left) array_unshift($_nodes, $node->left);
+                    $_r[] = $node->val;
+                }
+            }
+            $l_r = !$l_r;
+            $nodes = $_nodes;
+            $r[] = $_r;
+        }
+        return $r;
+    }
+
+    /**
+     * 117. 填充每个节点的下一个右侧节点指针 II
+     * @param Node $root
+     * @return Node
+     */
+    public function connect($root)
+    {
+        if (!$root) return null;
+
+        # 逐层处理
+        # 记录下一层第一个，下一层的前一个
+        $first = $prev = null;
+        # 第一层相当于已经处理好了
+        $node = $root;//$root需要返回
+        while ($node) {
+            if ($node->left) {
+                #记录下层第一个 反复看了代码这么优化了果然简洁多了
+                if (!$prev) $first = $prev = $node->left;
+                else $prev = $prev->next = $node->left;
+                //$cur = $node->left;
+                //#记录下层第一个
+                //if(!$first)$first = $cur;
+                //elseif($prev)$prev->next = $cur;//连接前一个
+                //$prev = $cur;//更新前一个
+            }
+            if ($node->right) {
+                if (!$prev) $first = $prev = $node->right;
+                else $prev = $prev->next = $node->right;
+            }
+            $node = $node->next;
+            //if ($root->next) {
+            //    $root = $root->next;
+            //} else {
+            //    //一层处理完了就下一层
+            //    $root = $first;
+            //    $first = $prev = null;
+            //}
+        }
+        //递归代码更简洁
+        $this->connect($first);
+        return $root;
     }
 }
