@@ -274,6 +274,55 @@ class Solution
         }
         return $r;
     }
+
+    /**
+     * 18. 四数之和
+     * 根据3数和思路解出来了，但错了多次，这样7788搞了2h。。
+     * @param Integer[] $nums
+     * @param Integer $target
+     * @return Integer[][]
+     */
+    function fourSum($nums, $target) {
+        $n = count($nums);
+        if($n<4)return [];
+        sort($nums);
+        $r = [];
+        for($i=0; $i<$n-3; $i++){
+            if($i>0 && $nums[$i-1]==$nums[$i])continue;
+            $x = $target - $nums[$i];
+            if($x > $nums[$n-2]+$nums[$n-1]+$nums[$n-3])continue;
+            if($x < $nums[$i+1]+$nums[$i+2]+$nums[$i+3])break;
+            for($j=$i+1; $j<$n-2; $j++){
+                if($j>$i+1 && $nums[$j-1]==$nums[$j])continue;
+                $y = $x - $nums[$j];
+                $start = $j+1;
+                $end = $n-1;
+                // echo "==>$start, $end\n";
+                //没想到这两行优化10倍
+                if($y > $nums[$end-1]+$nums[$end])continue;
+                if($y < $nums[$start]+$nums[$start+1])break;
+                while($start<$end){
+                    // echo "$num, $nums[$j], $nums[$start], $nums[$end]\n";
+                    $z = $nums[$start]+$nums[$end];
+                    if($y == $z){
+                        // echo "===\n";
+                        // echo "$y $nums[$start] $nums[$end]\n";
+                        $r[] = [$nums[$i], $nums[$j], $nums[$start], $nums[$end]];
+                        //这里错了几次，写在判断式里是多执行一次
+                        // while($end>$start && $nums[$end-1]==$nums[$end--]);//$end--;
+                        // while($end>$start && $nums[$start+1]==$nums[$start++]);//$start++;
+                    }
+                    if($y >= $z){
+                        while($end>$start && $nums[$start+1]==$nums[$start++]);
+                    }
+                    if($y <= $z){
+                        while($end>$start && $nums[$end-1]==$nums[$end--]);
+                    }
+                }
+            }
+        }
+        return $r;
+    }
     /*
     $swap = function(&$arr, $i, $j){
         $tmp = $arr[$i];
