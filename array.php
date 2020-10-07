@@ -27,7 +27,7 @@ class Solution
             $j = 1;
             do {
                 if ($bit % 2)array_unshift($sub, $nums[$n - $j]);
-                $bit >> = 1;
+                $bit >>= 1;
                 $j++;
             }while ($bit);
             $r[] = $sub;
@@ -520,5 +520,41 @@ class Solution
         }
         print_r($c);
         return $c[$i - 1];
+    }
+
+    /**
+     * 75. 颜色分类
+     * @param Integer[] $nums
+     * @return NULL
+     */
+    function sortColors(&$nums)
+    {
+        # 逐个交换，高级
+        $l = 0;
+        $r = count($nums) - 1;
+        $i = 0;
+        while ($i <= $r) {
+            if ($nums[$i] === 0) {
+                //0交换到左边指针处
+                [$nums[$i], $nums[$l]] = [$nums[$l], $nums[$i]];
+                $i++;
+                $l++;
+            } elseif ($nums[$i] === 1) {
+                $i++;
+            } else {
+                //2交换到后面去
+                [$nums[$i], $nums[$r]] = [$nums[$r], $nums[$i]];
+                $r--;
+            }
+        }
+        return;
+        # 一次性统计
+        $stat = array_count_values($nums);
+        $c = $stat[0] + $stat[1];
+        foreach($nums as $i => &$num){
+            if($i<$stat[0])$num = 0;
+            elseif($i<$c)$num = 1;
+            else $num = 2;
+        }
     }
 }
