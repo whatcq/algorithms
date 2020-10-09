@@ -132,6 +132,38 @@ class Solution
     }
 
     /**
+     * 142. 环形链表 II
+     * @param ListNode $head
+     * @return ListNode
+     */
+    function detectCycle($head) {
+        $fast = $slow = $head;
+        while($fast && $fast->next){
+            $slow = $slow->next;
+            $fast = $fast->next->next;
+            if($slow === $fast){
+                $fast = $head;
+                //Start-X-Meet, fast是slow的两倍，2(SX+XM)=SX+XM+MX+XM
+                //=>MX=SX。fast必须head开始，不能head->next。
+                while($fast !== $slow){
+                    $fast = $fast->next;
+                    $slow = $slow->next;
+                }
+                return $fast;
+            }
+        }
+        return null;
+        # 太慢
+        $map = [];
+        while($head){
+            if(false !== $k = array_search($head, $map, false))return $head;
+            $map[] = $head;
+            $head = $head->next;
+        }
+        return null;
+    }
+
+    /**
      * 回文链表
      * @param ListNode $head
      * @return Boolean
