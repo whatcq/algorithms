@@ -930,11 +930,33 @@ class Solution
         return false;
     }
 
+    //python 一行牛逼！
+    //class Solution(object):
+    //    def canPartition(self, s):
+    //        return 1-sum(s)%2==reduce(lambda x,y:x|(x<<y), s, 1)>>sum(s)/2&1
+    /*
+    //c++位运算法，烧脑
+    class Solution {
+    public:
+        bool canPartition(vector<int>& nums) {
+
+            if(nums.size()<2)   return false;
+
+            int sum = accumulate(nums.begin(), nums.end(), 0);
+            if(sum&1)  return false;
+
+            bitset<10001> bits(1);
+            for (auto n : nums) bits |= bits << n;
+            return bits[sum >> 1];
+        }
+    }
+    */
     /**
      * 416. 分割等和子集
      * 耗费我半天时间的题，终于搞定了。
      * 自己的dfs重复深搜了，超时，半天没理清楚；后来学到了，记录no[target][num]去重：此乃记忆深搜
      * 解题说是背包问题，网上找半天没找到php版，找到的还是错的，其他语言的也没翻译成功。
+     * 走完leetcode用例的坑，网上答案的坑，最终3个解法：记忆深搜，暴力背包，迭代法全组合，还可以优化成位运算，牛了逼了
      * 2020/10/13 1:41 这题最终又耗费我3h，不能死磕了，要劳逸
      * @param Integer[] $nums
      * @return Boolean
