@@ -38,6 +38,51 @@ class Solution
         return $this->r;
     }
 
+    private $x = PHP_INT_MAX;
+
+    /**
+     * 530. 二叉搜索树的最小绝对差
+     * 这么简单一个题，看错题目两遍，细节错误两次，关键错误一次。。
+     * @param TreeNode $root
+     * @return Integer
+     */
+    function getMinimumDifference($root)
+    {
+        $prev = null;
+        $this->inOrderTask($root, $prev);
+        return $this->x;
+
+        $x = PHP_INT_MAX;
+        $prev = PHP_INT_MIN;
+        $p = $root;
+        $stack = [];
+        while ($p || $stack) {
+            if ($p) {
+                $stack[] = $p;
+                $p = $p->left;
+            } else {
+                $p = array_pop($stack);
+                if ($x > $_x = $p->val - $prev) $x = $_x;
+                $prev = $p->val;
+                // echo $p->val, ' ';
+                $p = $p->right;
+            }
+        }
+        return $x;
+    }
+
+    // $prev是全局的，记住！要么传地址，要么定义类变量$this->prev
+    function inOrderTask($root, &$prev)
+    {
+        if (!$root) return;
+        $this->inOrderTask($root->left, $prev);
+        if ($prev !== null) {
+            if ($this->x > $x = $root->val - $prev) $this->x = $x;
+        }
+        $prev = $root->val;
+        $this->inOrderTask($root->right, $prev);
+    }
+
     private $sum = 0;
 
     /**
@@ -136,16 +181,17 @@ class Solution
      * @param ListNode $head
      * @return ListNode
      */
-    function detectCycle($head) {
+    function detectCycle($head)
+    {
         $fast = $slow = $head;
-        while($fast && $fast->next){
+        while ($fast && $fast->next) {
             $slow = $slow->next;
             $fast = $fast->next->next;
-            if($slow === $fast){
+            if ($slow === $fast) {
                 $fast = $head;
                 //Start-X-Meet, fast是slow的两倍，2(SX+XM)=SX+XM+MX+XM
                 //=>MX=SX。fast必须head开始，不能head->next。
-                while($fast !== $slow){
+                while ($fast !== $slow) {
                     $fast = $fast->next;
                     $slow = $slow->next;
                 }
@@ -155,8 +201,8 @@ class Solution
         return null;
         # 太慢
         $map = [];
-        while($head){
-            if(false !== $k = array_search($head, $map, false))return $head;
+        while ($head) {
+            if (false !== $k = array_search($head, $map, false)) return $head;
             $map[] = $head;
             $head = $head->next;
         }

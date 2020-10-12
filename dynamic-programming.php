@@ -687,29 +687,31 @@ class Solution
 
     //==============
     private $total = 0;
+
     /**
      * 968. 监控二叉树 难在理清逻辑流程
      *
      * @param  TreeNode $root
      * @return Integer
      */
-    function minCameraCover($root) 
+    function minCameraCover($root)
     {
-        if(!$root) return 0 ;
-        if($this->minCameraCoverDFS($root)===0) $this->total++;
+        if (!$root) return 0;
+        if ($this->minCameraCoverDFS($root) === 0) $this->total++;
         return $this->total;
     }
+
     function minCameraCoverDFS($root)
     {
         //当前节点3种状态
         $l = $r = 2;//默认不用管！
-        if ($root->left) $l=$this->minCameraCoverDFS($root->left);
-        if ($root->right) $r=$this->minCameraCoverDFS($root->right);
-        if ($l===0 || $r===0) {
+        if ($root->left) $l = $this->minCameraCoverDFS($root->left);
+        if ($root->right) $r = $this->minCameraCoverDFS($root->right);
+        if ($l === 0 || $r === 0) {
             $this->total++;
             return 1;//1：自己安监视器 
         }
-        if ($l===1 || $r===1) return 2;//2：可被子女照看，故未装监视器 
+        if ($l === 1 || $r === 1) return 2;//2：可被子女照看，故未装监视器
         return 0;//0：无子女照看，要么自己装，要么靠爹
     }
 
@@ -924,6 +926,116 @@ class Solution
                     return true;
                 }
             }
+        }
+        return false;
+    }
+
+    /**
+     * 416. 分割等和子集
+     * 耗费我半天时间的题，终于搞定了。
+     * 自己的dfs重复深搜了，超时，半天没理清楚；后来学到了，记录no[target][num]去重：此乃记忆深搜
+     * 解题说是背包问题，网上找半天没找到php版，找到的还是错的，其他语言的也没翻译成功。
+     * 2020/10/13 1:41 这题最终又耗费我3h，不能死磕了，要劳逸
+     * @param Integer[] $nums
+     * @return Boolean
+     */
+    function canPartition($nums)
+    {
+        $sum = array_sum($nums);
+        if ($sum % 2) return false;
+        $target = $sum / 2;
+
+        #全组合，直接迭代，替代掉背包的低效循环（有的值组合不了！）
+        //用set表示可以组成的和
+        $set = [0 => 0];
+        foreach ($nums as $num) {
+            foreach ($set as $_sum => $_) {
+                //if (!is_numeric($item)) continue;
+                if ($target < $_sum += $num) continue;//这里不能break！只是本轮递增，但_sum小的可能前面几轮没出现过——那也就不用排序了！
+                if ($target == $_sum) return true;//加这行还快点？也许是多测试用例综合吧
+                $set[$_sum] = 0;
+            }
+            //$set["=$i"] = '-------' . $num;
+        }
+        return false;
+
+        sort($nums);
+        #深搜，排序+记忆化去重
+        return $this->canPartitionFind($nums, $sum / 2, 0);
+        return $this->dfs($nums, $sum / 2, 0);
+        return $this->_01($nums, $sum / 2, 0);
+
+        $target = $sum / 2;
+        #背包，思路：因为题目说nums<100,n<200，所以总值<2w/2，所以用dp(我以为是高级方法，理解才知垃圾)
+        //总和 => 是否可以组成
+        $dp[0] = true;
+        //主要为了初始化数组，不然报Notice错误
+        //这方法不排序（也不知排序耗时不？），先用一个数nums[0]填一空，这思想太low了，不理解
+        for ($i = 1; $i <= $target; $i++) {
+            $dp[$i] = $i == $nums[0];
+            /*这代码典型啰嗦
+            if ($i == $nums[0]) {
+                $dp[$i] = true;
+            } else {
+                $dp[$i] = false;
+            }*/
+        }
+        for ($i = 1; $i < count($nums); $i++) {
+            for ($j = $target; $j >= $nums[$i]; $j--) {
+                //O(n^2)遍历得，当前值能否组合，这么做不如全组合了：(@see 78. 子集)
+                $dp[$j] = $dp[$j] || $dp[$j - $nums[$i]];
+            }
+        }
+        return $dp[$target];
+    }
+
+    //看来这是之前通过的代码！晕,这不跟我dfs一样了嘛，还得记忆去重
+    function canPartitionFind($nums, $target, $index)
+    {
+        if ($target == 0) return true;
+        echo "$target $index\n";
+        for ($i = $index, $n = count($nums); $i < $n; $i++) {
+            if ($i > $index && $nums[$i] == $nums[$i - 1]) continue;//这根本没用，只是同级去重，记忆去重就够了，也就不用排序了！
+            //if ($target == $nums[$i]) return true;//出结果只有一次，放在递归函数里。。。其实一样的！不过那样可以有初始化判断。
+            if ($target < $nums[$i]) return false;
+            if (isset($this->no[$target][$nums[$i]])) continue;
+            if ($this->canPartitionFind($nums, $target - $nums[$i], $i + 1)) return true;
+            $this->no[$target][$nums[$i]] = 0;
+        }
+        return false;
+    }
+
+    //这个01背包代码逻辑清晰代码简洁，跟我dfs是一个道理，但也没有去重，超时
+    function _01($nums, $target, $i)
+    {
+        if ($nums[$i] == $target) return true;
+        if ($nums[$i] > $target) return false;
+        if (!isset($nums[$i + 1])) return false;
+        return $this->_01($nums, $target - $nums[$i], $i + 1) || $this->_01($nums, $target, $i + 1);
+    }
+
+    private $no = [];
+
+    function dfs($nums, $target, $p)
+    {
+        echo implode(' ', $nums), " = $target\n";
+        $prev = null;
+        foreach ($nums as $i => $num) {
+            if ($i <= $p) continue;//我竟然在这里没写=，超时了
+            if (/*isset($nums[$i - 1]) && */
+                $nums[$i - 1] == $num
+            ) continue;
+            if ($num == $target) return true;
+            elseif ($num < $target) {
+                if (isset($this->no[$target][$num])) continue;
+                if ($prev == $num) continue;
+                $prev = $num;
+                //$tmp = $nums;
+                //unset($tmp[$i]);
+                //if (!$tmp) return false;
+                if ($this->dfs($nums, $target - $num, $i)) return true;
+                $this->no[$target][$num] = 0;
+            } else return false;
         }
         return false;
     }
