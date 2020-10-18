@@ -187,6 +187,7 @@ class Solution
                 continue;
             }
             // 即时运算的方式避免了“回溯”，其他语言也可以通过写一个函数来达到同样效果
+            // array_merge会重置数字索引key！注意区别与+
             $this->_solveNQueens2(
                 $n,
                 $row + 1,

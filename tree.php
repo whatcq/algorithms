@@ -311,13 +311,13 @@ class Solution
     function removeNthFromEnd($head, $n)
     {
         # 辅助的虚拟头部，高级！
-        $dummyHead = new ListNode(0);
-        $dummyHead->next = $head;
-        $p = $q = $dummyHead;
-        for ($i = 0; $i < $n + 1; $i++) {
+        $p = $q = $dummyHead = new ListNode(0, $head);
+        //q需要比p多走n+1步，写法各异
+        while ($n--) {
             $q = $q->next;
         }
-        while ($q) {
+        //这方式让p少走一步，条件是$q的话，前面需要让$q多走一步
+        while ($q->next) {
             $q = $q->next;
             $p = $p->next;
         }

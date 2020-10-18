@@ -536,7 +536,7 @@ class Solution
         while ($i <= $r) {
             if ($nums[$i] === 0) {
                 //0交换到左边指针处
-                [$nums[$i], $nums[$l]] = [$nums[$l], $nums[$i]];
+                [$nums[$i], $nums[$l]] = [$nums[$l], $nums[$i]];//php7.1+
                 $i++;
                 $l++;
             } elseif ($nums[$i] === 1) {
