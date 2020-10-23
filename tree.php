@@ -216,6 +216,28 @@ class Solution
      */
     function isPalindrome2($head)
     {
+        #O(1)反转一半链表
+        $slow = $head;
+        $fast = $head->next;
+        if(!$fast)return true;
+        $prev = null;
+        while($fast->next->next){
+            $next = $slow->next;
+            $slow->next = $prev;
+            $prev = $slow;
+            $slow = $next;
+            $fast = $fast->next->next;
+        }
+        $forward = $fast->next ? $slow->next->next : $slow->next;
+        $slow->next = $prev;
+        $back = $slow;
+        while($back && $back->val == $forward->val){
+            $back = $back->next;
+            $forward = $forward->next;
+        }
+        return !$back;
+
+        # 额外栈+双指针
         if (!$head) return true;
         $arr = [];
         while ($head) {
