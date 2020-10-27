@@ -557,4 +557,65 @@ class Solution
             else $num = 2;
         }
     }
+
+    /**
+     * 845. 数组中的最长山脉
+     * 看似很简单一个题，思路高级代码才干净
+     * @param Integer[] $A
+     * @return Integer
+     */
+    function longestMountain($A)
+    {
+        # 这个思路太棒了,干净利落
+        $max = 0;
+        $i = 1;
+        $n = count($A);
+        while ($i < $n) {
+            // 一次循环翻一条山，先上再下，最后走完平原，$i++语句重复了，但其他简单了
+            $up = $down = 0;
+            while ($A[$i] > $A[$i - 1] && $i < $n) {
+                $i++;
+                $up++;
+            }
+            while ($A[$i] < $A[$i - 1] && $i < $n) {
+                $i++;
+                $down++;
+            }
+            if ($up > 0 && $down > 0) $max = max($max, 1 + $up + $down);
+            while ($A[$i] == $A[$i - 1] && $i < $n) $i++;
+        }
+        return $max;
+
+        # 自己写的，根据业务逻辑写if-else调试多次太累，就是因为没有整理出来
+        // 官方解法还有 遍历找峰、找谷。。
+        // ><不包含==的情况，所以这怎么写？==的情况只能放最前面处理
+        $mt = 0;
+        $direct = 1;
+        $prev = $A[0];
+        $m = 1;
+        for ($i = 1, $n = count($A); $i < $n; $i++) {
+            echo "$direct * ( {$A[$i]}-$prev $m \n";
+            if ($A[$i] == $prev) {
+                if ($direct < 0 && $m > 2 && $mt < $m) $mt = $m;
+                $m = 1;
+                $direct = 1;
+            } else {
+                if ($direct * ($A[$i] - $prev) > 0) {
+                    $m++;
+                } elseif ($m > 1) {
+                    // $mt = max($mt, $m);
+                    if ($direct == -1) {
+                        if ($m > $mt) $mt = $m;
+                        $m = 2;
+                    } else {
+                        $m++;
+                    }
+                    $direct *= -1;
+                }
+            }
+            $prev = $A[$i];
+        }
+        if ($direct < 0 && $m > $mt) $mt = $m;
+        return $mt;
+    }
 }
