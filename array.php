@@ -618,4 +618,28 @@ class Solution
         if ($direct < 0 && $m > $mt) $mt = $m;
         return $mt;
     }
+
+    /**
+     * 463. 岛屿的周长
+     * 就这么一个简单题，我不看答案不知还要试多久
+     * 完全想错了思路，还explore四周！
+     * @param Integer[][] $grid
+     * @return Integer
+     */
+    function islandPerimeter($grid)
+    {
+        $sum = 0;
+        $x = count($grid);
+        $y = count($grid[0]);
+        for ($i = 0; $i < $x; $i++) {
+            for ($j = 0; $j < $y; $j++) {
+                if ($grid[$i][$j] == 1) {
+                    $sum += 4;
+                    if (!empty($grid[$i][$j - 1])) $sum -= 2;
+                    if (!empty($grid[$i - 1][$j])) $sum -= 2;
+                }
+            }
+        }
+        return $sum;
+    }
 }
