@@ -46,6 +46,7 @@ class Trie
         if (!isset($word[$i]) && isset($p[0])) {
             unset($p[0]);
             // 这段代码写了太久。。2020-11-2
+            // 指针不能拷贝，所以只能反复回到桌面一层层进入
             $n = strlen($word);
             while ($n) {
                 $p = &$this->dict;

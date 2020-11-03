@@ -8,7 +8,8 @@ class Solution
      * @param Integer[] $nums
      * @return Integer[][]
      */
-    function subsets($nums) {
+    function subsets($nums)
+    {
         #迭代法
         $result = [[]];
         foreach ($nums as $num) {
@@ -17,19 +18,19 @@ class Solution
             }
         }
         return $result;
-        
+
         #位运算 这么简单一个题，我想了这么个高级方法，服了自己。。
         $r = [[]];
         $n = count($nums);
-        for($i = 1, $l = 1 << $n; $i < $l; $i++) {
+        for ($i = 1, $l = 1 << $n; $i < $l; $i++) {
             $sub = [];
             $bit = $i;
             $j = 1;
             do {
-                if ($bit % 2)array_unshift($sub, $nums[$n - $j]);
+                if ($bit % 2) array_unshift($sub, $nums[$n - $j]);
                 $bit >>= 1;
                 $j++;
-            }while ($bit);
+            } while ($bit);
             $r[] = $sub;
         }
         return $r;
@@ -282,29 +283,30 @@ class Solution
      * @param Integer $target
      * @return Integer[][]
      */
-    function fourSum($nums, $target) {
+    function fourSum($nums, $target)
+    {
         $n = count($nums);
-        if($n<4)return [];
+        if ($n < 4) return [];
         sort($nums);
         $r = [];
-        for($i=0; $i<$n-3; $i++){
-            if($i>0 && $nums[$i-1]==$nums[$i])continue;
+        for ($i = 0; $i < $n - 3; $i++) {
+            if ($i > 0 && $nums[$i - 1] == $nums[$i]) continue;
             $x = $target - $nums[$i];
-            if($x > $nums[$n-2]+$nums[$n-1]+$nums[$n-3])continue;
-            if($x < $nums[$i+1]+$nums[$i+2]+$nums[$i+3])break;
-            for($j=$i+1; $j<$n-2; $j++){
-                if($j>$i+1 && $nums[$j-1]==$nums[$j])continue;
+            if ($x > $nums[$n - 2] + $nums[$n - 1] + $nums[$n - 3]) continue;
+            if ($x < $nums[$i + 1] + $nums[$i + 2] + $nums[$i + 3]) break;
+            for ($j = $i + 1; $j < $n - 2; $j++) {
+                if ($j > $i + 1 && $nums[$j - 1] == $nums[$j]) continue;
                 $y = $x - $nums[$j];
-                $start = $j+1;
-                $end = $n-1;
+                $start = $j + 1;
+                $end = $n - 1;
                 // echo "==>$start, $end\n";
                 //没想到这两行优化10倍
-                if($y > $nums[$end-1]+$nums[$end])continue;
-                if($y < $nums[$start]+$nums[$start+1])break;
-                while($start<$end){
+                if ($y > $nums[$end - 1] + $nums[$end]) continue;
+                if ($y < $nums[$start] + $nums[$start + 1]) break;
+                while ($start < $end) {
                     // echo "$num, $nums[$j], $nums[$start], $nums[$end]\n";
-                    $z = $nums[$start]+$nums[$end];
-                    if($y == $z){
+                    $z = $nums[$start] + $nums[$end];
+                    if ($y == $z) {
                         // echo "===\n";
                         // echo "$y $nums[$start] $nums[$end]\n";
                         $r[] = [$nums[$i], $nums[$j], $nums[$start], $nums[$end]];
@@ -312,11 +314,11 @@ class Solution
                         // while($end>$start && $nums[$end-1]==$nums[$end--]);//$end--;
                         // while($end>$start && $nums[$start+1]==$nums[$start++]);//$start++;
                     }
-                    if($y >= $z){
-                        while($end>$start && $nums[$start+1]==$nums[$start++]);
+                    if ($y >= $z) {
+                        while ($end > $start && $nums[$start + 1] == $nums[$start++]) ;
                     }
-                    if($y <= $z){
-                        while($end>$start && $nums[$end-1]==$nums[$end--]);
+                    if ($y <= $z) {
+                        while ($end > $start && $nums[$end - 1] == $nums[$end--]) ;
                     }
                 }
             }
@@ -551,11 +553,35 @@ class Solution
         # 一次性统计
         $stat = array_count_values($nums);
         $c = $stat[0] + $stat[1];
-        foreach($nums as $i => &$num){
-            if($i<$stat[0])$num = 0;
-            elseif($i<$c)$num = 1;
+        foreach ($nums as $i => &$num) {
+            if ($i < $stat[0]) $num = 0;
+            elseif ($i < $c) $num = 1;
             else $num = 2;
         }
+    }
+
+    /**
+     * 941. 有效的山脉数组
+     * @param Integer[] $A
+     * @return Boolean
+     */
+    function validMountainArray($A)
+    {
+        $n = count($A);
+        if ($n < 3) return false;//这句测试用例多？
+
+        # 业务中间判断
+        for ($i = 1; $i < $n && $A[$i - 1] < $A[$i]; $i++) ;
+        if ($i == 1 || $i == $n) return false;
+        for (; $i < $n && $A[$i - 1] > $A[$i]; $i++) ;
+        return $i == $n;
+
+        # 双指针法，思路没理清，还调试几次
+        $left = 0;
+        $right = $n - 1;
+        while ($left < $n - 2 && $A[$left + 1] > $A[$left]) $left++;
+        while (1 < $right && $A[$right - 1] > $A[$right]) $right--;
+        return $right == $left;
     }
 
     /**
