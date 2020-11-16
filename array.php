@@ -642,4 +642,63 @@ class Solution
         }
         return $sum;
     }
+
+    /**
+     * 402. 移掉K位数字
+     * 看似简单一道题，倒回n步的问题=>贪心待学
+     * @param String $num
+     * @param Integer $k
+     * @return String
+     */
+    function removeKdigits($num, $k)
+    {
+        if (strlen($num) <= $k) return '0';
+
+        # 额外空间 8ms！
+        // 贪心:让高位尽可能低 从高位向低位遍历 若高位可被更小的代替 则直接代替 但最多只能代替k次
+        // 故前几位会形成一个递增序列 可利用单调栈 最多弹出k次
+        $s = [];
+        $t = 0;
+        foreach (str_split($num) as $n) {
+            while ($s && $n < end($s) && $t < $k) {
+                array_pop($s);
+                $t++;
+            }
+            $s[] = $n;
+        }
+        if ($t < $k) {
+            $s = array_slice($s, 0, -$k + $t);
+        }
+        foreach ($s as $i => $x) {
+            if ($x) break;
+            unset($s[$i]);
+        }
+        return $s ? implode('', $s) : '0';
+
+        # 数组形式 350ms
+        $num = str_split($num);
+        $i = 0;
+        while ($k--) {
+            while (isset($num[$i + 1]) && $num[$i + 1] >= $num[$i]) $i++;
+            // 到结尾是特殊情况，一次搞定
+            if (!isset($num[$i + 1])) {
+                return implode('', array_slice($num, 0, -$k - 1));
+            }
+            unset($num[$i--]);
+            $num = array_values($num);//re-index,<=应该是这一步费时间
+        }
+        foreach ($num as $i => $x) {
+            if ($x) break;
+            unset($num[$i]);
+        }
+        return $num ? implode('', $num) : '0';
+
+        # 字符串形式，反复处理，逻辑简单 160ms
+        while ($k--) {
+            $i = 1;
+            while (isset($num[$i]) && $num[$i] >= $num[$i - 1]) $i++;
+            $num = substr_replace($num, '', $i - 1, 1);
+        }
+        return ltrim($num, '0') ?: '0';
+    }
 }
