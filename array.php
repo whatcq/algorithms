@@ -693,12 +693,65 @@ class Solution
         }
         return $num ? implode('', $num) : '0';
 
-        # 字符串形式，反复处理，逻辑简单 160ms
+        # 字符串形式，反复处理，逻辑简单 160ms=>优化成1遍处理，8ms！
+        $i = 0;
         while ($k--) {
-            $i = 1;
-            while (isset($num[$i]) && $num[$i] >= $num[$i - 1]) $i++;
-            $num = substr_replace($num, '', $i - 1, 1);
+            while (isset($num[$i + 1]) && $num[$i + 1] >= $num[$i]) $i++;
+            $num = substr_replace($num, '', $i, 1);//这函数性能可以:)
+            $i && $i--;
         }
         return ltrim($num, '0') ?: '0';
+    }
+
+    /**
+     * 406. 根据身高重建队列
+     * 输入：[[7,0], [4,4], [7,1], [5,0], [6,1], [5,2]]
+     * 输出：[[5,0], [7,0], [5,2], [6,1], [4,4], [7,1]]
+     * @param Integer[][] $people
+     * @return Integer[][]
+     */
+    function reconstructQueue($people) {
+        // 高个子先站好位
+        usort($people, function ($a, $b) {
+            return $a[0] > $b[0] || ($a[0] == $b[0] && $a[1] < $b[1]) ? -1 : 1;
+        });
+        $r = [];
+        // 没想到真的可以动态排队！
+        foreach ($people as $v) {
+            array_splice($r, $v[1], 0, [$v]);
+        }
+        return $r;
+
+        // 还可以有高级排队 数据结构！
+        $list = new SplDoublyLinkedList();
+        foreach ($people as $p) {
+            // 把p加到p[1]下标为右边数的位置
+            $list->add($p[1], $p);
+        }
+        foreach ($list as $val) {
+            $r[] = $val;
+        }
+        return $r;
+
+        // 矮的先,辛苦想出来，结果还落后！
+        usort($people, function ($a, $b) {
+            return $a[0] > $b[0] || ($a[0] == $b[0] && $a[1] > $b[1]) ? 1 : -1;
+        });
+        $r = range(1, count($people));
+        $prev = -1;
+        $_p = $c = 0;
+        foreach ($people as list($h, $k)) {
+            $h > $prev ? $c = 0 : $c++;
+            $prev = $h;
+            $empty = -1;
+            $p = $_p;
+            while ($empty < $k - $c) {
+                is_array($r[$p++]) or $empty++;
+                $empty < 0 && $_p++;
+            }
+            $r[$p - 1] = [$h, $k];
+        }
+        foreach ($r as $i => $v) echo "\n$i: ", is_array($v) ? implode(' ', $v) : "($v)";
+        return $r;
     }
 }
