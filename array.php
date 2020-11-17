@@ -759,7 +759,7 @@ class Solution
         }
         return $r;
 
-        // 矮的先,辛苦想出来，结果还落后！
+        // 矮的先,辛苦做出来，结果还是落后的！
         usort($people, function ($a, $b) {
             return $a[0] > $b[0] || ($a[0] == $b[0] && $a[1] > $b[1]) ? 1 : -1;
         });
@@ -779,5 +779,122 @@ class Solution
         }
         foreach ($r as $i => $v) echo "\n$i: ", is_array($v) ? implode(' ', $v) : "($v)";
         return $r;
+    }
+
+    /**
+     * 973. 最接近原点的 K 个点
+     * @param Integer[][] $points
+     * @param Integer $K
+     * @return Integer[][]
+     */
+    function kClosest($points, $K) {
+        # 大顶堆 @see https://www.php.net/manual/en/class.splheap.php
+        $heap = new SplMaxHeap();
+        $r = [];
+        foreach ($points as list($a, $b)) {
+            $c = $a * $a + $b * $b;
+            $heap->insert([$c, [$a, $b]]);//原来还可以这样玩
+            if ($heap->count() > $K) {
+                $heap->extract();
+            }
+        }
+        while (!$heap->isEmpty()) {
+            $r[] = $heap->extract()[1];
+        }
+        return $r;
+
+        # my
+        $heap = new SplMaxHeap();
+        $r = [];
+        foreach ($points as list($a, $b)) {
+            $c = $a * $a + $b * $b;
+            if ($heap->count() < $K) {
+                $heap->insert($c);
+                isset($r[$c]) ? $r[$c][] = [$a, $b] : $r[$c] = [[$a, $b]];
+            } elseif ($c < $heap->top()) {
+                $heap->insert($c);
+                isset($r[$c]) ? $r[$c][] = [$a, $b] : $r[$c] = [[$a, $b]];
+                $x = $heap->extract();
+                array_pop($r[$x]);
+            }
+        }
+        $res = [];
+        foreach ($r as $v) {
+            $res = array_merge($res, $v);
+        }
+        return $res;
+    }
+
+    /**
+     * 1030. 距离顺序排列矩阵单元格
+     * @param Integer $R
+     * @param Integer $C
+     * @param Integer $r0
+     * @param Integer $c0
+     * @return Integer[][]
+     */
+    function allCellsDistOrder($R, $C, $r0, $c0) {
+        # 桶排序
+        $map = [];
+        for ($i = 0; $i < $R; ++$i) {
+            for ($j = 0; $j < $C; ++$j) {
+                $distance = abs($r0 - $i) + abs($c0 - $j);
+                $map[$distance][] = [$i, $j];
+            }
+        }
+        $answer = [];
+        // 这样避免排序，高！
+        for ($k = 0; $k < $R + $C; ++$k) {
+            if (isset($map[$k])) {
+                foreach ($map[$k] as $value) {
+                    $answer[] = $value;
+                }
+            }
+        }
+        return $answer;
+
+        # 排序
+        for ($i = 0; $i < $R; $i++) {
+            for ($j = 0; $j < $C; $j++) {
+                $d = abs($i - $r0) + abs($j - $c0);
+                $l[$d][] = [$i, $j];
+            }
+        }
+        ksort($l);
+        $r = [];
+        foreach ($l as $v) {
+            $r = array_merge($r, $v);
+        }
+        return $r;
+
+        #　高级数据结构 还不够快？
+        $heap = new SplMinHeap;
+        for ($i = 0; $i < $R; $i++) {
+            for ($j = 0; $j < $C; $j++) {
+                $heap->insert([abs($r0 - $i) + abs($c0 - $j), [$i, $j]]);
+            }
+        }
+        $r = [];
+        while (!$heap->isEmpty()) {
+            $r[] = $heap->extract()[1];
+        }
+        return $r;
+
+        # 更复杂的排序函数
+        $list = [];
+        $long = [];
+        for ($i = 0; $i < $R; $i++) {
+            for ($j = 0; $j < $C; $j++) {
+                $list[] = [$i, $j];
+                $tmp = abs($r0 - $i) + abs($c0 - $j);
+                $long[] = [$tmp, [$i, $j]];
+            }
+        }
+        array_multisort(array_column($long, '0'), SORT_ASC, $long);
+        $res = [];
+        foreach ($long as $v) {
+            $res[] = $v[1];
+        }
+        return $res;
     }
 }
