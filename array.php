@@ -818,6 +818,8 @@ class Solution
                 array_pop($r[$x]);
             }
         }
+        // 利用好现成的函数
+        return array_reduce($r, 'array_merge', []);
         $res = [];
         foreach ($r as $v) {
             $res = array_merge($res, $v);
@@ -861,13 +863,14 @@ class Solution
             }
         }
         ksort($l);
+        return array_reduce($l, 'array_merge', []);
         $r = [];
         foreach ($l as $v) {
             $r = array_merge($r, $v);
         }
         return $r;
 
-        #　高级数据结构 还不够快？
+        #　高级数据结构 还不够快？--比桶排序多余了些排序步骤
         $heap = new SplMinHeap;
         for ($i = 0; $i < $R; $i++) {
             for ($j = 0; $j < $C; $j++) {
@@ -891,10 +894,49 @@ class Solution
             }
         }
         array_multisort(array_column($long, '0'), SORT_ASC, $long);
+        return array_column($long, 1);
         $res = [];
         foreach ($long as $v) {
             $res[] = $v[1];
         }
         return $res;
+    }
+
+    /**
+     * 283. 移动零
+     * 如此简单的题!还是要小心才能对。。
+     * @param Integer[] $nums
+     * @return NULL
+     */
+    function moveZeroes(&$nums)
+    {
+        $p = 0;
+        for ($i = 0, $n = count($nums); $i < $n; $i++) {
+            if ($nums[$i]) {
+                $nums[$p++] = $nums[$i];
+                //细化判断反而浪费时间
+                //$i>$p && $nums[$p] = $nums[$i];
+                //$p++;
+                //题目要求尽量减少操作次数,否则这样一遍过
+                //$nums[$i] = 0;
+            }
+        }
+        for ($i = $p; $i < $n; $i++) {
+            $nums[$i] = 0;
+        }
+        return;
+        // 之前做过的题目，这回还是原来的思路，但对题目本身却没印象
+        $empty = [];
+        for ($i = 0, $n = count($nums); $i < $n; $i++) {
+            if ($nums[$i]) {
+                if ($empty) {
+                    $nums[array_shift($empty)] = $nums[$i];
+                    $nums[$i] = 0;
+                    $empty[] = $i;
+                }
+            } else {
+                $empty[] = $i;
+            }
+        }
     }
 }
