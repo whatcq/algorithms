@@ -539,6 +539,7 @@ class Solution
             if ($nums[$i] === 0) {
                 //0交换到左边指针处
                 [$nums[$i], $nums[$l]] = [$nums[$l], $nums[$i]];//php7.1+
+                //list($nums[$i], $nums[$l]) = [$nums[$l], $nums[$i]];//php7.1-
                 $i++;
                 $l++;
             } elseif ($nums[$i] === 1) {
@@ -938,5 +939,34 @@ class Solution
                 $empty[] = $i;
             }
         }
+    }
+
+    /**
+     * nums1里两数乘积=nums2里一数的平方 （含重复），求个数
+     * 很简单一个题，还可怎么优化？
+     * @param Integer[] $nums1
+     * @param Integer[] $nums2
+     * @return Integer
+     */
+    function numTriplets($nums1, $nums2)
+    {
+        $count = 0;
+        $pow = $x = [];
+        foreach ($nums1 as $i => $num) {
+            isset($pow[$num * $num]) ? $pow[$num * $num]++ : $pow[$num * $num] = 1;
+            foreach ($nums1 as $j => $_num) {
+                if ($i < $j){
+                    $ji = $num * $_num;
+                    isset($x[$ji]) ? $x[$ji]++ : $x[$ji]=1;
+                }
+            }
+        }
+        foreach ($nums2 as $i => $num) {
+            isset($x[$num * $num]) && $count += $x[$num * $num];
+            foreach ($nums2 as $j => $_num) {
+                if ($i < $j && isset($pow[$num * $_num])) $count += $pow[$num * $_num];
+            }
+        }
+        return $count;
     }
 }
