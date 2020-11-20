@@ -219,9 +219,9 @@ class Solution
         #O(1)反转一半链表
         $slow = $head;
         $fast = $head->next;
-        if(!$fast)return true;
+        if (!$fast) return true;
         $prev = null;
-        while($fast->next->next){
+        while ($fast->next->next) {
             $next = $slow->next;
             $slow->next = $prev;
             $prev = $slow;
@@ -231,7 +231,7 @@ class Solution
         $forward = $fast->next ? $slow->next->next : $slow->next;
         $slow->next = $prev;
         $back = $slow;
-        while($back && $back->val == $forward->val){
+        while ($back && $back->val == $forward->val) {
             $back = $back->next;
             $forward = $forward->next;
         }
@@ -970,5 +970,74 @@ class Solution
         //递归代码更简洁
         $this->connect($first);
         return $root;
+    }
+
+    /**
+     * 147. 对链表进行插入排序
+     * 修改链表就像用吊车调东西一样，挂起，前面钩上，后面再钩上，繁琐
+     * @param ListNode $head
+     * @return ListNode
+     */
+    function insertionSortList($head)
+    {
+        # 理顺这个思路不容易啊：递增都pass，基准不断后移到最新位置
+        $dummyhead = new ListNode(-1);
+        $dummyhead->next = $head;
+        $preNode = $head;
+        $node = $head->next;
+        while ($preNode && $node) {
+            if ($preNode->val <= $node->val) {
+                $preNode = $node;
+                $node = $node->next;
+                continue;
+            }
+            $preNode->next = $node->next;
+            $temp = $dummyhead;
+            while ($temp->next->val <= $node->val) {
+                $temp = $temp->next;
+            }
+            $node->next = $temp->next;
+            $temp->next = $node;
+            $node = $preNode->next;
+        }
+        return $dummyhead->next;
+
+        # 这个思路，完全参考了数组的插入排序，固定以前面的一个为基准，O(n^2)
+        // 但链表不用逐个搬动，位置本来就是相对的
+        $dummy = new ListNode(0);
+        $dummy->next = $head;
+        $prev = $dummy;
+        $last = $head;
+        while ($last->next) {
+            $p = $last->next;
+            $pPrev = $last;
+            while ($p) {
+                $pNext = $p->next;
+                if ($p->val < $last->val) {
+                    $_prev = $dummy;
+                    $_p = $_prev->next;
+                    while ($_p->val < $p->val) {
+                        $_prev = $_p;
+                        $_p = $_p->next;
+                    }
+                    $_prev->next = $p;
+                    $p->next = $_p;
+                    $pPrev->next = $pNext;
+                } else {
+                    $pPrev = $p;
+                }
+                $p = $pNext;
+            }
+            $prev = $last;
+            // 优化一下：递增的都放过去，其实就和前面一个道理了
+            while($last->next && $last->next->val >= $last->val){
+                $prev = $last;
+                $last = $last->next;
+            }
+            //原来代码
+            //while ($prev->next->val === $prev->val) $prev = $prev->next;
+            //$last = $prev->next;
+        }
+        return $dummy->next;
     }
 }
