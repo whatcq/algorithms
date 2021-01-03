@@ -969,4 +969,59 @@ class Solution
         }
         return $count;
     }
+
+    /**
+     * 5642. 大餐计数
+     * @param Integer[] $deliciousness
+     * @return Integer
+     */
+    function countPairs($deliciousness)
+    {
+        $count = 0;
+        $stat = array_count_values($deliciousness);
+        ksort($stat);
+        foreach ($stat as $a => $x) {
+            for ($k = 0; $k <= 21; $k++) {
+                $b = (1 << $k) - $a;
+                if ($b < 0) continue;
+                if ($b == $a) $count = ($count + $x * ($x - 1) / 2) % 1000000007;
+                elseif ($b > $a && isset($stat[$b])) $count = ($count + $x * $stat[$b]) % 1000000007;
+            }
+        }
+        return $count;
+
+        // 改成字典判断，但还是O(n^2)，在利用一下字典思路，其实就是答案
+        $set = [];
+        $i = 0;
+        while ($i < 31) {
+            $set[1 << $i++] = 0;
+        }
+        $stat = array_count_values($deliciousness);
+        ksort($stat);
+        $count = 0;
+        foreach ($stat as $a => $x) {
+            if ($x > 1 && isset($set[$a + $a])) $count = ($count + $x * ($x - 1) / 2) % 1000000007;
+            foreach ($stat as $b => $y) {
+                if ($a >= $b) continue;
+                if (isset($set[$a + $b])) $count = ($count + $x * $y) % 1000000007;
+            }
+        }
+        return $count;
+
+        // 每个都判断，确实超时
+        $is2 = function ($n) {
+            while ($n && $n % 2 == 0) $n >>= 1;
+            return $n == 1;
+        };
+        $stat = array_count_values($deliciousness);
+        $count = 0;
+        foreach ($stat as $a => $x) {
+            if ($x > 1 && $is2($a + $a)) $count = ($count + $x * ($x - 1) / 2) % 1000000007;
+            foreach ($stat as $b => $y) {
+                if ($a >= $b) continue;
+                if ($is2($a + $b)) $count = ($count + $x * $y) % 1000000007;
+            }
+        }
+        return $count;
+    }
 }

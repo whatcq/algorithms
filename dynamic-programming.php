@@ -1062,4 +1062,48 @@ class Solution
         }
         return false;
     }
+
+    /**
+     * 1664. 生成平衡数组的方案数
+     * @param Integer[] $nums
+     * @return Integer
+     */
+    function waysToMakeFair($nums)
+    {
+        $n = count($nums);
+        $dp = array_fill(0, $n + 1, 0);
+        $ans = 0;
+        for ($i = 1; $i < $n + 1; ++$i) {
+            $dp[$i] = $dp[$i - 1] + ($i % 2 ? $nums[$i - 1] : -$nums[$i - 1]);
+        }
+        for ($i = 1; $i < $n + 1; ++$i) {
+            if ($dp[$i - 1] == $dp[$n] - $dp[$i])
+                $ans++;
+        }
+        return $ans;
+
+        // 我就是不会动态规划 的具象思维
+        $n = count($nums);
+        if ($n < 1) return 0;
+        if ($n == 1) return 1;
+        if ($n == 2) return 0;
+
+        $sum[-2] = 0;
+        $sum[-1] = 0;
+        for ($i = 0; $i < $n; $i++) {
+            $sum[$i] = $nums[$i] + $sum[$i - 2];
+        }
+        // print_r($sum);
+        $c = 0;
+        $last[0] = $sum[$n - 1 - ($n - 1) % 2];//最后一个序数余0则就是最后一个，余1则前一个
+        $last[1] = $sum[$n - 1 - $n % 2];
+        foreach ($nums as $i => $num) {
+            //remove $num
+            $cur = $i % 2;
+            $other = ($i + 1) % 2;
+            //echo $sum[$i] - $num + $last[$other] - $sum[$i - 1] ,'==', $sum[$i - 1] + $last[$cur] - $sum[$i], " ---$i\n";
+            if ($sum[$i] - $num + $last[$other] - $sum[$i - 1] == $sum[$i - 1] + $last[$cur] - $sum[$i]) $c++;
+        }
+        return $c;
+    }
 }
