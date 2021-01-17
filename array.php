@@ -737,7 +737,8 @@ class Solution
      * @param Integer[][] $people
      * @return Integer[][]
      */
-    function reconstructQueue($people) {
+    function reconstructQueue($people)
+    {
         // 高个子先站好位
         usort($people, function ($a, $b) {
             return $a[0] > $b[0] || ($a[0] == $b[0] && $a[1] < $b[1]) ? -1 : 1;
@@ -788,7 +789,8 @@ class Solution
      * @param Integer $K
      * @return Integer[][]
      */
-    function kClosest($points, $K) {
+    function kClosest($points, $K)
+    {
         # 大顶堆 @see https://www.php.net/manual/en/class.splheap.php
         $heap = new SplMaxHeap();
         $r = [];
@@ -836,7 +838,8 @@ class Solution
      * @param Integer $c0
      * @return Integer[][]
      */
-    function allCellsDistOrder($R, $C, $r0, $c0) {
+    function allCellsDistOrder($R, $C, $r0, $c0)
+    {
         # 桶排序
         $map = [];
         for ($i = 0; $i < $R; ++$i) {
@@ -955,9 +958,9 @@ class Solution
         foreach ($nums1 as $i => $num) {
             isset($pow[$num * $num]) ? $pow[$num * $num]++ : $pow[$num * $num] = 1;
             foreach ($nums1 as $j => $_num) {
-                if ($i < $j){
+                if ($i < $j) {
                     $ji = $num * $_num;
-                    isset($x[$ji]) ? $x[$ji]++ : $x[$ji]=1;
+                    isset($x[$ji]) ? $x[$ji]++ : $x[$ji] = 1;
                 }
             }
         }
@@ -1023,5 +1026,56 @@ class Solution
             }
         }
         return $count;
+    }
+
+    /**
+     * 5243. 同积元组
+     * @param Integer[] $nums
+     * @return Integer
+     */
+    function tupleSameProduct($nums)
+    {
+
+        $n = count($nums);
+        if ($n < 4) return 0;
+
+        # 空间，没想到这么简单，完全是因为想复杂了走岔了。。
+        $set = [];
+        $count = 0;
+        for ($i = 0; $i < $n; $i++) {
+            for ($j = 0; $j < $i; $j++) {
+                $ji = $nums[$i] * $nums[$j];
+                if (isset($set[$ji])) {
+                    $count += $set[$ji];
+                    $set[$ji]++;
+                } else {
+                    $set[$ji] = 1;
+                }
+            }
+        }
+        return 8 * $count;
+
+        # 时间复杂度上升了一个维度，
+        sort($nums);
+        $count = 0;
+        $map = array_flip($nums);#map 比 双指针 少一半扫描量
+        $a = 0;
+        while ($a < $n - 3) {
+            $d = $n - 1;
+            while ($d > $a + 2) {
+                $c = $a + 1;
+                while ($c < $d - 1) {
+                    $b = $nums[$a] * $nums[$d] / $nums[$c];
+                    if ($b < $nums[$c]) break;
+                    if (is_int($b) && $b > $nums[$c] && isset($map[$b])) {
+                        $count++;
+                    }
+                    $c++;
+                }
+                $d--;
+            }
+            $a++;
+        }
+        return 8 * $count;
     }
 }
