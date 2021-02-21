@@ -2,7 +2,8 @@
 
 /**
  * Trie字典树(array)
- * User: Cqiu
+ * array实现其实也没有问题，链表也许好些？
+ * @author: Cqiu
  * Date: 2020/11/1
  * Time: 21:29
  */

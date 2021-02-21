@@ -288,6 +288,132 @@ function shellSort(array $lists)
     return $lists;
 }
 
+
+/**
+ * 计数排序(一桶一数)
+ * 适用于一定范围内的排序
+ * @param $arr
+ */
+function countSort($arr)
+{
+    $length = count($arr);
+    // 找出数组中的最大值 max($arr)不讲武德
+    $maxValue = $arr[0];
+    for ($i = 1; $i < $length; $i++) {
+        if ($arr[$i] > $maxValue) {
+            $maxValue = $arr[$i];
+        }
+    }
+    // 定长数组, 键会自动排序, PHP数组是hash表的实现,
+    // 如果这里用普通的数组, 键不会自动排序, 不存在的键也不会自动填充null
+    $frequency = new SplFixedArray($maxValue + 1);
+
+    // 统计arr中, 值出现的频次
+    for ($i = 0; $i < $length; $i++) {
+        if (empty($frequency[$arr[$i]]))
+            $frequency[$arr[$i]] = 0;
+        $frequency[$arr[$i]] += 1;
+    }
+
+    $arr = [];
+    // 遍历frequency, 如果其元素有值, 那么将键push到arr中
+    for ($i = 0; $i < count($frequency); $i++) {
+        if (!empty($frequency[$i])) {
+            for ($j = 0; $j < $frequency[$i]; $j++) {
+                $arr[] = $i;
+            }
+        }
+    }
+    return $arr;
+}
+
+function countSort2($arr)
+{
+    $count = count($arr);
+    # 获取最大的元素max、min
+    $max = $min = $arr[0];
+    # 范围为min ~ max 构建统计数组
+    $new = [];
+    # 便利数组填充 统计数组
+    for ($j = 0; $j < $count; $j++) {
+        if ($arr[$j] > $max) {
+            $max = $arr[$j];
+        }
+        if ($arr[$j] < $min) {
+            $min = $arr[$j];
+        }
+        if (isset($new[$arr[$j]])) {
+            $new[$arr[$j]]++;
+        } else {
+            $new[$arr[$j]] = 1;
+        }
+    }
+    # 便利数组输出结果
+    $str = [];
+    for ($k = $min; $k <= $max; $k++) {
+        if ($new[$k] == 0) {
+            continue;
+        }
+        // echo $new[$k] . "\n";
+        $n = 0;
+        while ($n <= $new[$k] - 1) {
+            $n++;
+            array_push($str, $k);
+        }
+    }
+    return $str;
+}
+
+define("BUCKET_MAX_CAP", 5); //每个桶的最大容量
+/**
+ * 一桶一范围
+ * @param array $arr
+ * @return array
+ */
+function bucketSort(array $arr)
+{
+    $arrLength = count($arr);
+    if ($arrLength <= 1) {
+        return $arr;
+    }
+
+    $min = min($arr);
+    $max = max($arr);
+    $buckets = []; //桶
+    $result = [];  //每个桶元素合并之后的结果
+
+    //计算一共需要多少个桶
+    $bucketNumber = ceil(($max - $min) / $arrLength) + 1;
+
+    //把所有元素放入桶中
+    foreach ($arr as $key => $value) {
+        //计算该元素在桶中的下标
+        $bucketIndex = ceil(($value - $min) / $arrLength);
+        $buckets[$bucketIndex][] = $value;
+    }
+
+    for ($i = 0; $i < $bucketNumber; $i++) {
+        $bucket = $buckets[$i];
+        //当前桶的元素个数
+        $currentBucketLen = count($bucket);
+
+        //如果桶为空，则跳过
+        if (0 == $currentBucketLen) {
+            continue;
+        }
+        //如果桶的元素个数超过最大值，则递归
+        if ($currentBucketLen > BUCKET_MAX_CAP) {
+            $sorted = bucketSort($bucket);
+        } else {
+            //对桶内元素进行快排
+            $sorted = quickSort($bucket);
+        }
+
+        $result = array_merge($result, $sorted);
+    }
+    return $result;
+}
+
 # 基数排序
 function radixSort(array $lists)
 {
