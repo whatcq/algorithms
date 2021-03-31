@@ -331,4 +331,71 @@ class Solution
         }
         return $result;
     }
+
+    /**
+     * 1668.最大重复子字符串
+     * @param String $sequence
+     * @param String $word
+     * @return Integer
+     */
+    function maxRepeating($sequence, $word)
+    {
+        /**
+         * KMP法O(n+m) <= 暴力比较O(nm)
+         * =strpos
+         * @param $text
+         * @param $pattern
+         * @return bool
+         */
+        $kmp = function ($text, $pattern) {
+            // 算出：模式串中每个字符从头重复的序数，如果全都为0说明完全不重复
+            $getNext = function ($pattern) {
+                $next[0] = -1;
+                $i = 0;
+                $j = -1;
+
+                $length = strlen($pattern);
+                while ($i < $length) {
+                    if ($j == -1 || $pattern[$i] == $pattern[$j]) {
+                        ++$i;
+                        ++$j;
+                        $next[$i] = $j;
+                    } else {
+                        $j = $next[$j];
+                    }
+                }
+                return $next;
+            };
+
+            $next = $getNext($pattern);
+            $i = 0;
+            $j = 0;
+            $tLength = strlen($text);
+            $pLength = strlen($pattern);
+
+            while ($i < $tLength && $j < $pLength) {
+                if ($j == -1 || $text[$i] == $pattern[$j]) {
+                    ++$i;
+                    ++$j;
+                } else {
+                    $j = $next[$j];
+                }
+            }
+
+            if ($j == $pLength) {
+                return true;
+            }
+
+            return false;
+        };
+
+        $ans = 0;
+        $str = $word;
+        while ($kmp($sequence, $word)) {
+            $word .= $str;
+            ++$ans;
+        }
+
+        return $ans;
+    }
 }
