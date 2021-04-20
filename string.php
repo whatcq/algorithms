@@ -101,7 +101,7 @@ class Solution
             }
         }
         return str_replace('#', '', $maxStr);
-        
+
         # 暴力法，二重循环
         $n = strlen($s);
         if ($n < 2) return $s;
@@ -212,6 +212,7 @@ class Solution
         }
         return $num;
     }
+
     /**
      * 214. 最短回文串（前面加字符使之成回文）
      * 说是困难，就往复杂想；结果挺简单
@@ -330,5 +331,22 @@ class Solution
             if ($s[0] == 0) break;
         }
         return $result;
+    }
+
+    /**
+     * 28. strpos
+     * @param $haystack
+     * @param $needle
+     * @return int
+     */
+    function strStr($haystack, $needle)
+    {
+        $n = strlen($needle);
+        $x = strlen($haystack) - $n;
+        for ($i = 0; $i <= $x; $i++) {
+            for ($j = 0; $j < $n && $haystack[$i + $j] == $needle[$j]; $j++) ;
+            if ($j == $n) return $i;
+        }
+        return -1;
     }
 }
