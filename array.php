@@ -13,13 +13,14 @@ class Solution
         #迭代法
         $result = [[]];
         foreach ($nums as $num) {
+            // result count:1,2,4,8不断翻倍
             foreach ($result as $item) {
                 $result[] = array_merge($item, [$num]);
             }
         }
         return $result;
 
-        #位运算 这么简单一个题，我想了这么个高级方法，服了自己。。
+        #位运算 O(n×2^n) 这么简单一个题，我想了这么个高级方法，服了自己。。
         $r = [[]];
         $n = count($nums);
         for ($i = 1, $l = 1 << $n; $i < $l; $i++) {
@@ -34,6 +35,26 @@ class Solution
             $r[] = $sub;
         }
         return $r;
+
+        // dfs O(n×2^n)
+        $r = [];
+        $dfs = function ($nums, $item = []) use (&$r, &$dfs) {
+            if (!$nums) {
+                $r[] = $item;
+                return;
+            }
+            // 提出当前num，加/不加 到临时item
+            $num = array_shift($nums);//开始错把这里写成循环了，其实递归就是一重循环，这里不需要二重循环
+            $dfs($nums, array_merge($item, [$num]));
+            $dfs($nums, $item);
+        };
+        $dfs($nums);
+        return $r;
+
+        // 如何控制返回的顺序（按元素个数）？不用排序。
+        // 思路1：1-->n/2循环，提出1个放$r，剩下的n-1放$r2，然后$r=array_merge($r1, array_reverse($r2));
+        // 思路2：n/2-->1循环，array_unshift($r, n/2);array_push($r, n-n/2);
+        // 不行。。。
     }
 
     /**

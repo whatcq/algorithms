@@ -26,7 +26,7 @@ class Solution
         $r = $this->div($dividend, $divisor);
         return $fu ? -$r : ($r > $INT_MAX ? $INT_MAX : $r);
 
-        # 缓存各倍数，循环搞定
+        # 缓存各倍数，循环搞定:除法就是 求 被除数里面有几个除数
         for ($i = $divisor; $i <= $dividend; $i = $i + $i) $exp[] = $i;
         $res = 0;
         $count = count($exp);
@@ -48,7 +48,7 @@ class Solution
             $r += $r;
             $ji = $jiX2;//不断翻倍
         }
-        return $r + $this->divide($dividend - $ji, $divisor);
+        return $r + $this->div($dividend - $ji, $divisor);
     }
 
     /**
