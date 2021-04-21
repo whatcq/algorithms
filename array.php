@@ -1048,4 +1048,55 @@ class Solution
         }
         return $count;
     }
+
+    /**
+     * 5243. 同积元组
+     * @param Integer[] $nums
+     * @return Integer
+     */
+    function tupleSameProduct($nums)
+    {
+
+        $n = count($nums);
+        if ($n < 4) return 0;
+
+        # 空间，没想到这么简单，完全是因为想复杂了走岔了。。
+        $set = [];
+        $count = 0;
+        for ($i = 0; $i < $n; $i++) {
+            for ($j = 0; $j < $i; $j++) {
+                $ji = $nums[$i] * $nums[$j];
+                if (isset($set[$ji])) {
+                    $count += $set[$ji];
+                    $set[$ji]++;
+                } else {
+                    $set[$ji] = 1;
+                }
+            }
+        }
+        return 8 * $count;
+
+        # 时间复杂度上升了一个维度，
+        sort($nums);
+        $count = 0;
+        $map = array_flip($nums);#map 比 双指针 少一半扫描量
+        $a = 0;
+        while ($a < $n - 3) {
+            $d = $n - 1;
+            while ($d > $a + 2) {
+                $c = $a + 1;
+                while ($c < $d - 1) {
+                    $b = $nums[$a] * $nums[$d] / $nums[$c];
+                    if ($b < $nums[$c]) break;
+                    if (is_int($b) && $b > $nums[$c] && isset($map[$b])) {
+                        $count++;
+                    }
+                    $c++;
+                }
+                $d--;
+            }
+            $a++;
+        }
+        return 8 * $count;
+    }
 }

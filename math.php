@@ -192,4 +192,18 @@ class Solution
         }
         return $N;
     }
+
+    /**
+     * 470. 用 Rand7() 实现 Rand10()
+     * 概率论、期望 @todo
+     * 尽量少的rand7调用次数
+     */
+    function rand10()
+    {
+        // 为什么不能是 *2=>1~14?
+        do {
+            $idx = (rand(1, 7) - 1) * 7 + rand(1, 7);#构造1~49的均匀分布
+        } while ($idx > 40);#剔除大于40的值，1-40等概率出现。
+        return 1 + ($idx - 1) % 10;
+    }
 }
