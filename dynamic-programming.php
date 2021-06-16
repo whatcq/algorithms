@@ -230,6 +230,18 @@ class Solution
     }
 
     /**
+     * 877. 石子游戏 （486题的特例）
+     * x粒石子(奇数)分成n堆(偶数)，排成一排，甲乙两人依次选择一堆（前面或后面）
+     * 返回甲是否必胜
+     * @param Integer[] $piles
+     * @return Boolean
+     */
+    function stoneGame($piles) {
+        // 先手必胜！因为无论怎么排序，无论怎么分，最后都分成了两组，而甲先选。。数学啊
+        return true;
+    }
+
+    /**
      * 486. 预测赢家
      * 业务挺清晰，代码半天没理清楚。。
      * 我的思路很具象化，抽象天赋不够。。
@@ -240,6 +252,16 @@ class Solution
      */
     function PredictTheWinner($nums)
     {
+        // 这才是动态规划！
+        $n = count($nums);
+        $dp = $nums;
+        for ($i = $n - 2; $i > -1; $i--) {
+            for ($j = $i + 1; $j < $n; $j++) {
+                $dp[$j] = max($nums[$i] - $dp[$j], $nums[$j] - $dp[$j - 1]);
+            }
+        }
+        return $dp[$n - 1] >= 0;
+
         $n = count($nums);
         if ($n < 3) return true;
         $this->half = array_sum($nums) / 2;
